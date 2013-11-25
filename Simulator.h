@@ -18,20 +18,19 @@
 #include <utility>
 
 #define PI 3.14159
-using namespace std;
-static float smoothing = 200;
-static const int gridCells = 10;
+#define WINDOW_WIDTH 600
+#define WINDOW_HEIGHT 400
+#define SCENE_DEPTH 200
+#define gridCells 10
 
-static float kernelFunction(vec3 difference) {
-  if(difference.length() > 2*smoothing) {
-    return 0;
-  }
-  //using one from the paper
-  return 1/(pow(PI,1.5)*pow(smoothing,3.))*exp(pow(difference.length(),2.)/pow(smoothing,2.));
-}
+using namespace std;
+
+const float smoothing = 3;
 
 class Simulator {
-  vector<Particle> allParticles;
+  float timestep;
+  int numTimesteps;
+  vector<Particle*> allParticles;
   //according to one of the research papers, we should keep a 3x3 grid of which cells particles are in.
   //This will reduce particle-to-particle interaction times to O(n) instead of O(n^2)
   
@@ -44,9 +43,26 @@ class Simulator {
   list<Particle*> nextParticleGrid[gridCells][gridCells][gridCells];
 
 
-  void initialize();
   
-  vector<Particle*> getNeighborsForParticle(Particle p);
+  public:
+    void initialize();
+    void advanceTimeStep();
+    void runSimulation();
+    static float kernelFunction(vec3 difference) {
+      if(difference.length() > 2*smoothing) {
+        return 0;
+      }
+      //using one from the paper
+      float term =1/(pow(PI,1.5)*pow(smoothing,3.));
+      float e = exp(pow(difference.length(),2.)/pow(smoothing,2.));
+      
+      return term * e;
+    }
+    void addParticle(Particle* p);
+
+  private:
+    vector<Particle*> getNeighborsForParticle(Particle* p);
+    void printParticleGrid();
   
 };
 
