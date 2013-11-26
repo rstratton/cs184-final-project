@@ -30,17 +30,10 @@ const float smoothing = 3;
 class Simulator {
   float timestep;
   int numTimesteps;
-  vector<Particle*> allParticles;
-  //according to one of the research papers, we should keep a 3x3 grid of which cells particles are in.
-  //This will reduce particle-to-particle interaction times to O(n) instead of O(n^2)
-  
-  //using maps is memory intensive but allows fast lookup. The other option is a 3x3 array. We can look into what works better.
-  map<tuple<int, int, int>,list<Particle*> > particleGridCurrent; //list because of fast insert and deletes
-  map<tuple<int, int, int>,list<Particle*> > particleGridNext; //because of fast insert and deletes
-  
-  //here's the 3x3 array method
-  list<Particle*> particleGrid[gridCells][gridCells][gridCells];
-  list<Particle*> nextParticleGrid[gridCells][gridCells][gridCells];
+  vector<Particle> allParticles;
+  //talked to the professor, seems like a list of int indices is the best method.
+  list<unsigned int> particleGrid[gridCells][gridCells][gridCells];
+  list<unsigned int> nextParticleGrid[gridCells][gridCells][gridCells];
 
 
   
@@ -58,10 +51,10 @@ class Simulator {
       
       return term * e;
     }
-    void addParticle(Particle* p);
+    void addParticle(Particle p);
 
   private:
-    vector<Particle*> getNeighborsForParticle(Particle* p);
+    vector<Particle*> getNeighborsForParticle(unsigned int i); //return a list of indices
     void printParticleGrid();
   
 };
