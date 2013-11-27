@@ -18,26 +18,25 @@
 #include <utility>
 
 #define PI 3.14159
-#define WINDOW_WIDTH 600
-#define WINDOW_HEIGHT 400
-#define SCENE_DEPTH 200
-#define gridCells 10
 
 using namespace std;
 
-const float smoothing = 3;
+const float smoothing = 10;
 
 class Simulator {
   float timestep;
   int numTimesteps;
+  int cutoff;
   vector<Particle> allParticles;
   //talked to the professor, seems like a list of int indices is the best method.
-  list<unsigned int> particleGrid[gridCells][gridCells][gridCells];
-  list<unsigned int> nextParticleGrid[gridCells][gridCells][gridCells];
+  vector<vector<vector<list<unsigned int> > > > particleGrid;
+  vector<vector<vector<list<unsigned int> > > > nextParticleGrid;
 
 
   
-  public:
+public:
+    vec3 worldSize;
+    int numGridCells;
     void initialize();
     void advanceTimeStep();
     void runSimulation();
@@ -51,7 +50,8 @@ class Simulator {
       
       return term * e;
     }
-    void addParticle(Particle p);
+    void addParticle(vec3 pos, FluidProperties fp);
+    Simulator(vec3 ws) : worldSize(ws) {};
 
   private:
     vector<Particle*> getNeighborsForParticle(unsigned int i); //return a list of indices

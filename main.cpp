@@ -10,14 +10,12 @@
 #include "Simulator.h"
 #include "Particle.h"
 #include "Color.h"
-#define gridCells 10
 int main(int argc, const char * argv[])
 {
-  Simulator s1 = Simulator();
+  Simulator s1 = Simulator(vec3(600,400,200));
   s1.initialize();
   FluidProperties fp = FluidProperties(1, 3, 3, Color(.2, .2, .8));
-  Particle p = Particle(vec3(0,300,0), fp, gridCells);
-  s1.addParticle(p);
+  s1.addParticle(vec3(0,300,0), fp);
   s1.runSimulation();
 
   std::cout << "Hello, World!\n";

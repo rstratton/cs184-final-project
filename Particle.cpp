@@ -24,16 +24,16 @@ void Particle::calculateForces(vector <Particle*> neighbors)  { //list of neighb
   acceleration = force/density; //is this right? not sure how to get acceleration once we have the force
 }
 
-void Particle::advanceTimeStep(int numCells, float timestep) {
+void Particle::advanceTimeStep(float timestep, int numGridCells) {
   velocity = velocity + acceleration*timestep;
   position += velocity;
   
-  gridPosition.x = floor((position[0]/WINDOW_WIDTH)*numCells);
-  gridPosition.y = floor((position[1]/WINDOW_HEIGHT)*numCells);
-  gridPosition.z = floor((position[2]/SCENE_DEPTH)*numCells);
+  gridPosition.x = floor((position[0]/sim->worldSize[0])*numGridCells);
+  gridPosition.y = floor((position[1]/sim->worldSize[1])*numGridCells);
+  gridPosition.z = floor((position[2]/sim->worldSize[2])*numGridCells);
 }
 
-Particle::Particle(vec3 initialPos, FluidProperties fluid, int numCells) : position(initialPos), fp(fluid) {
-  gridPosition = GridPosition(floor((position[0]/WINDOW_WIDTH)*numCells), floor((position[1]/WINDOW_HEIGHT)*numCells), floor((position[2]/SCENE_DEPTH)*numCells));
+Particle::Particle(vec3 initialPos, FluidProperties fluid, Simulator* s) : position(initialPos), fp(fluid), sim(s) {
+  gridPosition = GridPosition(floor((position[0]/sim->worldSize[0])*sim->numGridCells), floor((position[1]/sim->worldSize[1])*sim->numGridCells), floor((position[2]/sim->worldSize[2])*sim->numGridCells));
   
 }

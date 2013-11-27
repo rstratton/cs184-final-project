@@ -13,6 +13,7 @@
 #include <vector>
 #include "algebra3.h"
 #include "Color.h"
+class Simulator;
 using namespace std;
 
 struct FluidProperties {
@@ -38,11 +39,12 @@ struct Particle {
   vec3 force;
   vec3 acceleration;
   GridPosition gridPosition;
-  Particle (vec3 initialPos, FluidProperties fluid, int numCells);
+  Simulator* sim;
+  Particle (vec3 initialPos, FluidProperties fluid, Simulator* s);
  
   float calculateDensity(vector <Particle*> neighbors);
   void calculateForces(vector <Particle*> neighbors);
-  void advanceTimeStep(int numCells, float timestep);
+  void advanceTimeStep(float timestep, int numGridCells);
 };
 
 #endif /* defined(__final__Particle__) */
