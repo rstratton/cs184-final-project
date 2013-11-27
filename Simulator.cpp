@@ -14,9 +14,9 @@ using namespace std;
 void Simulator::initialize() {
   allParticles = vector<Particle> ();
   
-  cutoff = 2*smoothing;
+  cutoff = 2*properties.smoothing;
   
-  float max = fmax(fmax(worldSize[0],worldSize[1]),worldSize[2]);
+  float max = fmax(fmax(properties.worldSize[0],properties.worldSize[1]),properties.worldSize[2]);
   numGridCells = floorf(max / cutoff); //n
 #ifdef USE_ACCELERATION_STRUCTURES
 
@@ -32,7 +32,6 @@ void Simulator::initialize() {
   }
   nextParticleGrid = particleGrid;
 #endif
-  timestep = .01;
 }
 
 vector<Particle*> Simulator::getNeighborsForParticle(unsigned int i) {
@@ -70,7 +69,7 @@ void Simulator::advanceTimeStep() {
 #ifdef USE_ACCELERATION_STRUCTURES
     particleGrid[allParticles[i].gridPosition.x][allParticles[i].gridPosition.y][allParticles[i].gridPosition.z].remove(i);
 #endif
-    allParticles[i].advanceTimeStep(timestep,numGridCells);
+    allParticles[i].advanceTimeStep(properties.timestep,numGridCells);
 #ifdef USE_ACCELERATION_STRUCTURES
     if(allParticles[i].gridPosition.x >= 0 && allParticles[i].gridPosition.y >= 0
        && allParticles[i].gridPosition.z >= 0 && allParticles[i].gridPosition.x < numGridCells
@@ -82,8 +81,8 @@ void Simulator::advanceTimeStep() {
     }
 #else
     if (!(allParticles[i].position[0] >= 0 && allParticles[i].position[1] >= 0
-       && allParticles[i].position[2] >= 0 && allParticles[i].position[0] < worldSize[0]
-       && allParticles[i].position[1] < worldSize[1] && allParticles[i].position[2] < worldSize[2])) {
+       && allParticles[i].position[2] >= 0 && allParticles[i].position[0] < properties.worldSize[0]
+       && allParticles[i].position[1] < properties.worldSize[1] && allParticles[i].position[2] < properties.worldSize[2])) {
       toDelete.push_back(i);
     }
       
@@ -95,6 +94,7 @@ void Simulator::advanceTimeStep() {
   }
   
 }
+
 
 
 void Simulator::printParticleGrid() {
@@ -119,5 +119,17 @@ void Simulator::addParticle(vec3 pos, FluidProperties fp) {
 #ifdef USE_ACCELERATION_STRUCTURES
   particleGrid[p.gridPosition.x][p.gridPosition.y][p.gridPosition.z].push_back((unsigned int)allParticles.size()-1);
 #endif
+}
+
+
+float Simulator::kernelFunction(vec3 difference) {
+  if(difference.length() > 2*properties.smoothing) {
+    return 0;
+  }
+  //using one from the paper
+  float term =1/(pow(PI,1.5)*pow(properties.smoothing,3.));
+  float e = exp(pow(difference.length(),2.)/pow(properties.smoothing,2.));
+  
+  return term * e;
 }
 

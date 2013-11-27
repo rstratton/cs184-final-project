@@ -9,10 +9,17 @@
 #include <iostream>
 #include "Simulator.h"
 #include "Particle.h"
+#include "SceneParser.h"
 #include "Color.h"
 int main(int argc, const char * argv[])
 {
-  Simulator s1 = Simulator(vec3(600,400,200));
+  if(argc <= 1) {
+    printf("not enough arguments \n");
+    exit(1);
+  }
+  SceneParser p = SceneParser(argv[1]); //parses on construction
+  
+  Simulator s1 = Simulator(p.properties);
   s1.initialize();
   FluidProperties fp = FluidProperties(1, 3, 3, Color(.2, .2, .8));
   s1.addParticle(vec3(0,300,0), fp);

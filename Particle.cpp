@@ -13,7 +13,7 @@
 float Particle::calculateDensity(vector<Particle*> neighbors){ //todo: USE LINKED LIST INSTEAD OF VECTOR
   float sum = 0;
   for(int j = 0; j < neighbors.size(); j++) {
-    sum += neighbors[j]->fp.mass*Simulator::kernelFunction(position - neighbors[j]->position);
+    sum += neighbors[j]->fp.mass*sim->kernelFunction(position - neighbors[j]->position);
   }
   return sum;
 }
@@ -28,12 +28,15 @@ void Particle::advanceTimeStep(float timestep, int numGridCells) {
   velocity += acceleration*timestep;
   position += velocity*timestep;
   
-  gridPosition.x = floor((position[0]/sim->worldSize[0])*numGridCells);
-  gridPosition.y = floor((position[1]/sim->worldSize[1])*numGridCells);
-  gridPosition.z = floor((position[2]/sim->worldSize[2])*numGridCells);
+  gridPosition.x = floor((position[0]/sim->properties.worldSize[0])*numGridCells);
+  gridPosition.y = floor((position[1]/sim->properties.worldSize[1])*numGridCells);
+  gridPosition.z = floor((position[2]/sim->properties.worldSize[2])*numGridCells);
 }
 
 Particle::Particle(vec3 initialPos, FluidProperties fluid, Simulator* s) : fp(fluid), position(initialPos), sim(s) {
-  gridPosition = GridPosition(floor((position[0]/sim->worldSize[0])*sim->numGridCells), floor((position[1]/sim->worldSize[1])*sim->numGridCells), floor((position[2]/sim->worldSize[2])*sim->numGridCells));
+  gridPosition = GridPosition();
+  gridPosition.x = floor((position[0]/sim->properties.worldSize[0])*sim->numGridCells);
+  gridPosition.y = floor((position[1]/sim->properties.worldSize[1])*sim->numGridCells);
+  gridPosition.z = floor((position[2]/sim->properties.worldSize[2])*sim->numGridCells);
   
 }
