@@ -32,8 +32,7 @@ void Simulator::initialize() {
   }
   nextParticleGrid = particleGrid;
 #endif
-  numTimesteps = 100;
-  timestep = .1;
+  timestep = .01;
 }
 
 vector<Particle*> Simulator::getNeighborsForParticle(unsigned int i) {
@@ -97,12 +96,6 @@ void Simulator::advanceTimeStep() {
   
 }
 
-void Simulator::runSimulation() {
-  for(int i = 0; i < numTimesteps; i++) {
-    advanceTimeStep();
-    printParticleGrid();
-  }
-}
 
 void Simulator::printParticleGrid() {
   

@@ -30,7 +30,7 @@ struct GridPosition {
   GridPosition() :x(0), y(0), z(0){};
 };
 
-static vec3 gravity = vec3(0,-4.9,0);
+static vec3 gravity = vec3(0,-9.8,0); //in m/s/s
 
 struct Particle {
   FluidProperties fp;

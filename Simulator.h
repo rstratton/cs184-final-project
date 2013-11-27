@@ -25,9 +25,7 @@ const float smoothing = 10;
 
 class Simulator {
   float timestep;
-  int numTimesteps;
   int cutoff;
-  vector<Particle> allParticles;
   //talked to the professor, seems like a list of int indices is the best method.
   vector<vector<vector<list<unsigned int> > > > particleGrid;
   vector<vector<vector<list<unsigned int> > > > nextParticleGrid;
@@ -39,7 +37,8 @@ public:
     int numGridCells;
     void initialize();
     void advanceTimeStep();
-    void runSimulation();
+    vector<Particle> allParticles;
+
     static float kernelFunction(vec3 difference) {
       if(difference.length() > 2*smoothing) {
         return 0;
@@ -52,10 +51,11 @@ public:
     }
     void addParticle(vec3 pos, FluidProperties fp);
     Simulator(vec3 ws) : worldSize(ws) {};
+    void printParticleGrid();
+
 
   private:
     vector<Particle*> getNeighborsForParticle(unsigned int i); //return a list of indices
-    void printParticleGrid();
   
 };
 

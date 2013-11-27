@@ -25,8 +25,8 @@ void Particle::calculateForces(vector <Particle*> neighbors)  { //list of neighb
 }
 
 void Particle::advanceTimeStep(float timestep, int numGridCells) {
-  velocity = velocity + acceleration*timestep;
-  position += velocity;
+  velocity += acceleration*timestep;
+  position += velocity*timestep;
   
   gridPosition.x = floor((position[0]/sim->worldSize[0])*numGridCells);
   gridPosition.y = floor((position[1]/sim->worldSize[1])*numGridCells);

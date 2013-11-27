@@ -16,7 +16,11 @@ int main(int argc, const char * argv[])
   s1.initialize();
   FluidProperties fp = FluidProperties(1, 3, 3, Color(.2, .2, .8));
   s1.addParticle(vec3(0,300,0), fp);
-  s1.runSimulation();
+  int numTimesteps = 100;
+  for(int i = 0; i < numTimesteps; i++) {
+    s1.advanceTimeStep();
+    s1.printParticleGrid();
+  }
 
   std::cout << "Hello, World!\n";
     return 0;
