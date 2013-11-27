@@ -33,7 +33,7 @@ void Particle::advanceTimeStep(float timestep, int numGridCells) {
   gridPosition.z = floor((position[2]/sim->worldSize[2])*numGridCells);
 }
 
-Particle::Particle(vec3 initialPos, FluidProperties fluid, Simulator* s) : position(initialPos), fp(fluid), sim(s) {
+Particle::Particle(vec3 initialPos, FluidProperties fluid, Simulator* s) : fp(fluid), position(initialPos), sim(s) {
   gridPosition = GridPosition(floor((position[0]/sim->worldSize[0])*sim->numGridCells), floor((position[1]/sim->worldSize[1])*sim->numGridCells), floor((position[2]/sim->worldSize[2])*sim->numGridCells));
   
 }

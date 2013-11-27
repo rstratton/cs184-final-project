@@ -13,9 +13,13 @@ using namespace std;
 
 void Simulator::initialize() {
   allParticles = vector<Particle> ();
+  
   cutoff = 2*smoothing;
+  
   float max = fmax(fmax(worldSize[0],worldSize[1]),worldSize[2]);
   numGridCells = floorf(max / cutoff); //n
+#ifdef USE_ACCELERATION_STRUCTURES
+
   particleGrid = vector< vector<vector<list<unsigned int> > > >();
   for(int i = 0; i < numGridCells; i++) {
     particleGrid.push_back(vector<vector<list<unsigned int> > >());
@@ -27,10 +31,9 @@ void Simulator::initialize() {
     }
   }
   nextParticleGrid = particleGrid;
-    
+#endif
   numTimesteps = 100;
   timestep = .1;
-  
 }
 
 vector<Particle*> Simulator::getNeighborsForParticle(unsigned int i) {
@@ -65,8 +68,11 @@ void Simulator::advanceTimeStep() {
   }
   vector<int> toDelete = vector<int>();
   for(int i = 0; i< allParticles.size(); i++) {
+#ifdef USE_ACCELERATION_STRUCTURES
     particleGrid[allParticles[i].gridPosition.x][allParticles[i].gridPosition.y][allParticles[i].gridPosition.z].remove(i);
+#endif
     allParticles[i].advanceTimeStep(timestep,numGridCells);
+#ifdef USE_ACCELERATION_STRUCTURES
     if(allParticles[i].gridPosition.x >= 0 && allParticles[i].gridPosition.y >= 0
        && allParticles[i].gridPosition.z >= 0 && allParticles[i].gridPosition.x < numGridCells
        && allParticles[i].gridPosition.y < numGridCells && allParticles[i].gridPosition.z < numGridCells)
@@ -75,6 +81,14 @@ void Simulator::advanceTimeStep() {
     } else {
       toDelete.push_back(i);
     }
+#else
+    if (!(allParticles[i].position[0] >= 0 && allParticles[i].position[1] >= 0
+       && allParticles[i].position[2] >= 0 && allParticles[i].position[0] < worldSize[0]
+       && allParticles[i].position[1] < worldSize[1] && allParticles[i].position[2] < worldSize[2])) {
+      toDelete.push_back(i);
+    }
+      
+#endif
   }
   //now delete the particles
   for(int i = 0; i < toDelete.size(); i++) {
@@ -92,13 +106,14 @@ void Simulator::runSimulation() {
 
 void Simulator::printParticleGrid() {
   
-  //using 3x3 array for now
+#ifdef USE_ACCELERATION_STRUCTURES
   for(int y = 0; y < numGridCells; y++) {
     for(int x = 0; x < numGridCells; x++) {
       printf("%lu \t", particleGrid[x][y][0].size());
     }
     printf("\n");
   }
+#endif
   if(allParticles.size() > 0) {
       printf("\n %f %f %f \n ",allParticles[0].position[0], allParticles[0].position[1], allParticles[0].position[2]);
   }
@@ -108,6 +123,8 @@ void Simulator::printParticleGrid() {
 void Simulator::addParticle(vec3 pos, FluidProperties fp) {
   Particle p =  Particle(pos, fp, this);
   allParticles.push_back(p);
+#ifdef USE_ACCELERATION_STRUCTURES
   particleGrid[p.gridPosition.x][p.gridPosition.y][p.gridPosition.z].push_back((unsigned int)allParticles.size()-1);
+#endif
 }
 
