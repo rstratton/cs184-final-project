@@ -13,4 +13,6 @@ void SceneParser::parseScene(string fileName) {
   properties.worldSize = vec3(600,400,200);
   properties.timestep  = .01;
   properties.smoothing = 10;
+  objects = vector<StaticObject>();
+  volumes = vector<FluidVolume>();
 }

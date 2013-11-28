@@ -17,6 +17,7 @@
 #include <map>
 #include <utility>
 #include "SceneParser.h"
+#include "Fluid.h"
 #define PI 3.14159
 
 using namespace std;
@@ -29,21 +30,23 @@ class Simulator {
   //talked to the professor, seems like a list of int indices is the best method.
   vector<vector<vector<list<unsigned int> > > > particleGrid;
   vector<vector<vector<list<unsigned int> > > > nextParticleGrid;
-
+  vector<FluidVolume> volumes; //the initial volumes the fluids have. Really only needed for initialization
 
   
   public:
     SceneProperties properties;
-    int numGridCells;
+    //the objects the fluid will interact with
+    vector <StaticObject> objects;
+    int numGridCells;    //calculated at initialization
     void initialize();
     void addParticle(vec3 pos, FluidProperties fp);
     void advanceTimeStep();
     void printParticleGrid();
-    Simulator(SceneProperties p) : properties(p) {};
+    Simulator(SceneProperties p, vector<StaticObject> obj, vector<FluidVolume> fv) : volumes(fv), properties(p) , objects(obj){};
 
   protected:
-    friend struct Particle;
-    float kernelFunction(vec3 difference);
+    friend struct Particle; //so particle can use these methods
+    float kernelFunction(vec3 difference); //simple gaussian for now
     vector<Particle> allParticles;
 
   private:

@@ -11,17 +11,25 @@
 
 #include <iostream>
 #include "algebra3.h"
+#include "StaticObject.h"
+#include <vector>
+#include "Fluid.h"
 using namespace std;
+
+//struct to avoid having a lot of arguments passed around
 struct SceneProperties {
   vec3 worldSize;
   float timestep;
   float smoothing;
 };
 
+//parses the scene and populate the necessary fields
 class SceneParser {
   void parseScene(string fileName);
   public:
     SceneProperties properties;
+    vector<StaticObject> objects;
+    vector<FluidVolume> volumes;
     SceneParser(string fileName) {
       parseScene(fileName);
     }

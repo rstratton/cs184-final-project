@@ -11,6 +11,7 @@
 #include "Particle.h"
 #include "SceneParser.h"
 #include "Color.h"
+#include "StaticObject.h"
 int main(int argc, const char * argv[])
 {
   if(argc <= 1) {
@@ -18,8 +19,7 @@ int main(int argc, const char * argv[])
     exit(1);
   }
   SceneParser p = SceneParser(argv[1]); //parses on construction
-  
-  Simulator s1 = Simulator(p.properties);
+  Simulator s1 = Simulator(p.properties, p.objects, p.volumes);
   s1.initialize();
   FluidProperties fp = FluidProperties(1, 3, 3, Color(.2, .2, .8));
   s1.addParticle(vec3(0,300,0), fp);
