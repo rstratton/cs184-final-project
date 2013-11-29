@@ -14,19 +14,22 @@
 #include "StaticObject.h"
 int main(int argc, const char * argv[])
 {
-  if(argc <= 1) {
+  if(argc <= 2) {
     printf("not enough arguments \n");
     exit(1);
   }
   SceneParser p = SceneParser(argv[1]); //parses on construction
+  int numTimesteps = atoi(argv[2]);
   Simulator s1 = Simulator(p.properties, p.objects, p.volumes);
   s1.initialize();
-  FluidProperties fp = FluidProperties(1, 3, 3, Color(.2, .2, .8));
-  s1.addParticle(vec3(0,300,0), fp);
-  int numTimesteps = 100;
   for(int i = 0; i < numTimesteps; i++) {
     s1.advanceTimeStep();
     s1.printParticleGrid();
+
+    
+    //now something like:
+    //reconstructor.reconstructSurface()
+    //renderer.renderSurface()
   }
 
   std::cout << "Hello, World!\n";

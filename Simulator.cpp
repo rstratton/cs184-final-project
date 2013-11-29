@@ -14,12 +14,18 @@ using namespace std;
 void Simulator::initialize() {
   allParticles = vector<Particle> ();
   
-  cutoff = 2*properties.smoothing;
+  //set up the fluid at the initial state
+  for(int i = 0; i < volumes.size(); i ++) {
+    volumes[i].populateFluid(this); //puts the particles evenly spaced through the fluid volume.
+  }
   
+  //figure out the size for the grid
+  cutoff = 2*properties.smoothing;
   float max = fmax(fmax(properties.worldSize[0],properties.worldSize[1]),properties.worldSize[2]);
   numGridCells = floorf(max / cutoff); //n
+  
+  //initialize the grid
 #ifdef USE_ACCELERATION_STRUCTURES
-
   particleGrid = vector< vector<vector<list<unsigned int> > > >();
   for(int i = 0; i < numGridCells; i++) {
     particleGrid.push_back(vector<vector<list<unsigned int> > >());
@@ -49,6 +55,7 @@ vector<Particle*> Simulator::getNeighborsForParticle(unsigned int i) {
     }
   }
 #else
+  //naive, just iterate and check the distance
   for(int j = 0; j < allParticles.size(); j ++) {
     if((allParticles[j].position-p.position).length() < cutoff) {
       finalVector.push_back(&(allParticles[j]));
@@ -62,14 +69,18 @@ vector<Particle*> Simulator::getNeighborsForParticle(unsigned int i) {
 
 void Simulator::advanceTimeStep() {
   for(int i = 0; i < allParticles.size(); i++) {
-    allParticles[i].calculateForces(getNeighborsForParticle(i));
+    allParticles[i].calculateForces(getNeighborsForParticle(i)); //first loop to calculate new accelerations and forces
   }
   vector<int> toDelete = vector<int>();
+  //now actually move the particles
   for(int i = 0; i< allParticles.size(); i++) {
 #ifdef USE_ACCELERATION_STRUCTURES
     particleGrid[allParticles[i].gridPosition.x][allParticles[i].gridPosition.y][allParticles[i].gridPosition.z].remove(i);
 #endif
+    //move the particle
     allParticles[i].advanceTimeStep(properties.timestep,numGridCells);
+    
+    //delete any that went offscreen
 #ifdef USE_ACCELERATION_STRUCTURES
     if(allParticles[i].gridPosition.x >= 0 && allParticles[i].gridPosition.y >= 0
        && allParticles[i].gridPosition.z >= 0 && allParticles[i].gridPosition.x < numGridCells
@@ -88,7 +99,7 @@ void Simulator::advanceTimeStep() {
       
 #endif
   }
-  //now delete the particles
+  //now delete the particles that went offscreen
   for(int i = 0; i < toDelete.size(); i++) {
     allParticles.erase(allParticles.begin()+ (toDelete[i] - i)); //-i to deal with the offset of erasing the previous ones
   }
@@ -96,7 +107,7 @@ void Simulator::advanceTimeStep() {
 }
 
 
-
+//temporary function for debugging/testing
 void Simulator::printParticleGrid() {
   
 #ifdef USE_ACCELERATION_STRUCTURES
@@ -107,12 +118,14 @@ void Simulator::printParticleGrid() {
     printf("\n");
   }
 #endif
+  
   if(allParticles.size() > 0) {
       printf("\n %f %f %f \n ",allParticles[0].position[0], allParticles[0].position[1], allParticles[0].position[2]);
   }
 
 }
 
+//create a new particle at this position
 void Simulator::addParticle(vec3 pos, FluidProperties fp) {
   Particle p =  Particle(pos, fp, this);
   allParticles.push_back(p);
@@ -122,11 +135,12 @@ void Simulator::addParticle(vec3 pos, FluidProperties fp) {
 }
 
 
+
 float Simulator::kernelFunction(vec3 difference) {
   if(difference.length() > 2*properties.smoothing) {
     return 0;
   }
-  //using one from the paper
+  //using one from the paper, a gaussian.
   float term =1/(pow(PI,1.5)*pow(properties.smoothing,3.));
   float e = exp(pow(difference.length(),2.)/pow(properties.smoothing,2.));
   
