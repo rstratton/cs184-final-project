@@ -28,13 +28,13 @@ FluidVolume::FluidVolume(FluidProperties fp, string v, vector<string> args) : vo
     //to evenly distribute points around the sphere, we will evenly distribute points around the surface of spheres of radii evenly spaced up to the target radius
     //this algorithm will get the radius and spacing even, but just uses "in the ballpark of numParticles"
     //i.e. its not exactly the numParticles, but its close-ish
-    float divisions = floor(pow(numParticles,1./3.));
+    float divisions = int(cbrt(numParticles));
     for(float radius = rad; radius > 0; radius -= rad / divisions) {
-      for(float phi = 2*PI; phi > 0; phi -= (2*PI) / divisions) {
-        for(float theta = 2*PI; theta > 0; theta -= (2*PI)/ divisions) {
-          float x = center[0] + rad*cos(phi);
-          float y = center[1] + rad*sin(theta);
-          float z = center[2] + rad*sin(phi);
+      for(float phi = 0; phi < 2*PI; phi += (2*PI) / divisions) {
+        for(float theta = 0; theta < 2*PI; theta += (2*PI)/ divisions) {
+          float x = center[0] + radius*cos(phi);
+          float y = center[1] + radius*sin(theta);
+          float z = center[2] + radius*sin(phi);
           points.push_back(vec3(x,y,z));
         }
       }
