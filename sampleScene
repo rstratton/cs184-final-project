@@ -10,9 +10,9 @@ fluid water 1 1 1 0 .2 .8 .7
 
 #volume keyword. creates a volume of the specified fluid type.
 #format is volume fluidName volumeType [arguments]
-#for volumeType sphere, arguments are: centerX centerY centerZ radius
-#for volumeType box, arguments are: minX minY minZ lengthX lengthY lengthZ
+#for volumeType sphere, arguments are: centerX centerY centerZ radius numParticles
+#for volumeType box, arguments are: minX minY minZ lengthX lengthY lengthZ numParticles
 
 #this one is a sphere at the center with radius 50
-volume water sphere 300 200 100 50
+volume water sphere 300 200 100 50 100
 

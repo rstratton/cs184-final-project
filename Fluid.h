@@ -11,6 +11,7 @@
 
 #include <iostream>
 #include "Color.h"
+#include "algebra3.h"
 #include <vector>
 using namespace std;
 class Simulator;
@@ -31,6 +32,7 @@ class FluidVolume {
 private:
   string volumeType;
   FluidProperties fluid;
+  vector<vec3> points;
 public:
   void populateFluid(Simulator* sim);
   FluidVolume(FluidProperties fp, string v, vector<string> args); //the args will change depending on the type of volume (sphere or rect)

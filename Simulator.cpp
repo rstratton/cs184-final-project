@@ -120,7 +120,9 @@ void Simulator::printParticleGrid() {
 #endif
   
   if(allParticles.size() > 0) {
-      printf("\n %f %f %f \n ",allParticles[0].position[0], allParticles[0].position[1], allParticles[0].position[2]);
+    for(int i = 0; i < allParticles.size(); i++)
+      printf("\tpoint: %f %f %f \t ",allParticles[i].position[0], allParticles[i].position[1], allParticles[i].position[2]);
+    printf("\n \n");
   }
 
 }
