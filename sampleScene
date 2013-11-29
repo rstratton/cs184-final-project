@@ -14,5 +14,7 @@ fluid water 1 1 1 0 .2 .8 .7
 #for volumeType box, arguments are: minX minY minZ lengthX lengthY lengthZ numParticles
 
 #this one is a sphere at the center with radius 50
-volume water sphere 300 200 100 50 125
+#volume water sphere 300 200 100 50 125
 
+#this one is a rectangle
+volume water rect 100 100 50 100 100 100 125

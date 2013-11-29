@@ -43,6 +43,10 @@ class Simulator {
     void advanceTimeStep();
     void printParticleGrid();
     Simulator(SceneProperties p, vector<StaticObject> obj, vector<FluidVolume> fv) : volumes(fv), properties(p) , objects(obj){};
+  
+    //ability to initialize an empty one
+    Simulator() : volumes(vector<FluidVolume>()), properties(SceneProperties()) , objects(vector<StaticObject>()){};
+
 
   protected:
     friend struct Particle; //so particle can use these methods

@@ -39,5 +39,18 @@ FluidVolume::FluidVolume(FluidProperties fp, string v, vector<string> args) : vo
         }
       }
     }
+  }else if(volumeType == "rect") {
+    vec3 origin = vec3(atof(args[0].c_str()), atof(args[1].c_str()), atof(args[2].c_str()));
+    vec3 size = vec3(atof(args[3].c_str()), atof(args[4].c_str()), atof(args[5].c_str()));
+    int numParticles = atof(args[6].c_str());
+    
+    float divisions = int(cbrt(numParticles))-1;
+    for(int x = 0; x <= size[0]; x += size[0]/divisions) {
+      for(int y = 0; y <= size[1]; y += size[0]/divisions) {
+        for(int z = 0; z <= size[2]; z += size[0]/divisions) {
+          points.push_back(vec3(origin[0]+x,origin[1]+y,origin[2]+z));
+        }
+      }
+    }
   }
 }
