@@ -18,3 +18,7 @@ fluid water 1 1 1 0 .2 .8 .7
 
 #this one is a rectangle
 volume water rect 100 100 50 100 100 100 125
+
+#to define static objects:
+#object keyword then filename (obj file defining triangles) then x y z center
+object simpleRect.obj 100 200 100

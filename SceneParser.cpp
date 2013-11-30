@@ -58,6 +58,11 @@ void SceneParser::parseScene(string fileName) {
         vector<string> sub(splitline.begin() + 3, splitline.end());
         FluidVolume fv = FluidVolume(definedFluids[splitline[1]], splitline[2], sub);
         volumes.push_back(fv);
+      } else if(splitline[0] == "object") {
+        vec3 center = vec3(atof(splitline[2].c_str()),atof(splitline[3].c_str()),atof(splitline[4].c_str()));
+        StaticObject obj = StaticObject(splitline[1],center);
+      } else {
+        printf("unrecognized command: %s", splitline[0].c_str());
       }
       
     }
