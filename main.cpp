@@ -28,15 +28,32 @@ int main(int argc, const char * argv[])
 #include <iostream>
 #include "Simulator.h"
 #include "Particle.h"
+#include "SceneParser.h"
 #include "Color.h"
+#include "StaticObject.h"
+#include "unistd.h"
+
 int main(int argc, const char * argv[])
 {
-  Simulator s1 = Simulator(vec3(600,400,200));
+  if(argc <= 2) {
+    printf("not enough arguments \n");
+    exit(1);
+  }
+  SceneParser p = SceneParser(argv[1]); //parses on construction
+  int numTimesteps = atoi(argv[2]);
+  Simulator s1 = Simulator(p.properties, p.objects, p.volumes);
   s1.initialize();
-  FluidProperties fp = FluidProperties(1, 3, 3, Color(.2, .2, .8));
-  s1.addParticle(vec3(0,300,0), fp);
-  s1.runSimulation();
-
+  
+  
+  for(int i = 0; i < numTimesteps; i++) {
+    s1.advanceTimeStep();
+    s1.printParticleGrid();
+    
+    //now something like:
+    //reconstructor.reconstructSurface()
+    //renderer.renderSurface()
+  }
+  
   std::cout << "Hello, World!\n";
     return 0;
 }

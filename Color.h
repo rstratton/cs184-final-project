@@ -18,7 +18,7 @@ struct Color {
   float b;
   float a;
   Color (float red, float green, float blue, float alpha) : r(red), g(green), b(blue), a(alpha) {};
-  Color (float red, float green, float blue) : Color(red,green,blue,1) {};
+  Color (float red, float green, float blue) : r(red), g(green), b(blue), a(1) {};
   Color operator + (Color c2) {
     return Color(r+c2.r, g + c2.g, b + c2.b, fmin(1.,a + c2.a));
   }

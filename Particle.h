@@ -13,24 +13,21 @@
 #include <vector>
 #include "algebra3.h"
 #include "Color.h"
+#include "Fluid.h"
 class Simulator;
 using namespace std;
 
-struct FluidProperties {
-  float mass;
-  float viscosity;
-  float pressureConstant;
-  Color color;
-  FluidProperties(float m, float v, float p, Color c) : mass(m), viscosity(v), pressureConstant(p), color(c) {};
-};
-
+//for using the grid data structure.
 struct GridPosition {
   int x, y, z;
   GridPosition(int a, int b, int c) :x(a), y(b), z(c){};
   GridPosition() :x(0), y(0), z(0){};
 };
 
-static vec3 gravity = vec3(0,-4.9,0);
+
+
+
+static vec3 gravity = vec3(0,-9.8,0); //in m/s/s
 
 struct Particle {
   FluidProperties fp;

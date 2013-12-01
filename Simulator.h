@@ -16,46 +16,45 @@
 #include <list>
 #include <map>
 #include <utility>
-
+#include "SceneParser.h"
+#include "Fluid.h"
 #define PI 3.14159
 
 using namespace std;
 
-const float smoothing = 10;
 
 class Simulator {
-  float timestep;
-  int numTimesteps;
+  
   int cutoff;
-  vector<Particle> allParticles;
+
   //talked to the professor, seems like a list of int indices is the best method.
   vector<vector<vector<list<unsigned int> > > > particleGrid;
   vector<vector<vector<list<unsigned int> > > > nextParticleGrid;
-
+  vector<FluidVolume> volumes; //the initial volumes the fluids have. Really only needed for initialization
 
   
-public:
-    vec3 worldSize;
-    int numGridCells;
+  public:
+    SceneProperties properties;
+    //the objects the fluid will interact with
+    vector <StaticObject> objects;
+    int numGridCells;    //calculated at initialization
     void initialize();
-    void advanceTimeStep();
-    void runSimulation();
-    static float kernelFunction(vec3 difference) {
-      if(difference.length() > 2*smoothing) {
-        return 0;
-      }
-      //using one from the paper
-      float term =1/(pow(PI,1.5)*pow(smoothing,3.));
-      float e = exp(pow(difference.length(),2.)/pow(smoothing,2.));
-      
-      return term * e;
-    }
     void addParticle(vec3 pos, FluidProperties fp);
-    Simulator(vec3 ws) : worldSize(ws) {};
+    void advanceTimeStep();
+    void printParticleGrid();
+    Simulator(SceneProperties p, vector<StaticObject> obj, vector<FluidVolume> fv) : volumes(fv), properties(p) , objects(obj){};
+  
+    //ability to initialize an empty one
+    Simulator() : volumes(vector<FluidVolume>()), properties(SceneProperties()) , objects(vector<StaticObject>()){};
+
+
+  protected:
+    friend struct Particle; //so particle can use these methods
+    float kernelFunction(vec3 difference); //simple gaussian for now
+    vector<Particle> allParticles;
 
   private:
     vector<Particle*> getNeighborsForParticle(unsigned int i); //return a list of indices
-    void printParticleGrid();
   
 };
 
