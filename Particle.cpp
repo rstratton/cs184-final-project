@@ -10,7 +10,7 @@
 #include "Simulator.h"
 
 
-float Particle::calculateDensity(vector<Particle*> neighbors){ //todo: USE LINKED LIST INSTEAD OF VECTOR
+float Particle::calculateDensity(){ //todo: USE LINKED LIST INSTEAD OF VECTOR
   float sum = 0;
   for(int j = 0; j < neighbors.size(); j++) {
     sum += neighbors[j]->fp.mass*sim->kernelFunction(position - neighbors[j]->position);
@@ -18,10 +18,16 @@ float Particle::calculateDensity(vector<Particle*> neighbors){ //todo: USE LINKE
   return sum;
 }
 
-void Particle::calculateForces(vector <Particle*> neighbors, vector <float> pressures)  { //list of neighbors
+void Particle::calculateForces()  { //list of neighbors
   float density = calculateDensity(neighbors);
-  force = gravity*density; //need ot add other terms
-  acceleration = force/density; //is this right? not sure how to get acceleration once we have the force
+  vec3 pressureForce;
+  vec3 viscosityForce;
+  for(int i = 0; i < neighbors.length; i++) {
+    pressureForce -= (pressure + neighbors[i]->pressure)/2 * fp.mass/neighbors[i]->calculateDensity() * sim->pressureGradient(position - neighbors[i]->position);
+    viscosityForce += fp.viscosity * (neighbors[i]->velocity - velocity) * fp.mass/neighbors[i]->calculateDensity() * viscosityGradient(position - neighbors[i]->position);
+  }
+  force = pressureForce + viscosityForce + gravity*density; 
+  acceleration = force/density;
 }
 
 void Particle::advanceTimeStep(float timestep, int numGridCells) {
