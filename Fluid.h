@@ -21,8 +21,10 @@ struct FluidProperties {
   float mass;
   float viscosity;
   float pressureConstant;
+  float elasticity; //for solid collision
   Color color;
-  FluidProperties(float m, float v, float p, Color c) : mass(m), viscosity(v), pressureConstant(p), color(c) {};
+  
+  FluidProperties(float m, float v, float p, float e, Color c) : mass(m), viscosity(v), pressureConstant(p), elasticity(e), color(c) {};
   FluidProperties() : color(0,0,0) {};
 };
 

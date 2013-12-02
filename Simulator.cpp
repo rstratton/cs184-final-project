@@ -130,7 +130,7 @@ bool Simulator::checkObjectIntersection(int i) {
     if(objects[j]->intersectsRay(r, in)) {
       vec4 newDir = getReflectedRay(r, in).direction;
       newDir.normalize();
-      newDir *= allParticles[i].velocity.length() * ((properties.timestep-in->t_value) / properties.timestep);
+      newDir *= allParticles[i].fp.elasticity * allParticles[i].velocity.length() * ((properties.timestep-in->t_value) / properties.timestep);
       allParticles[i].velocity = newDir;
       return true;
     }

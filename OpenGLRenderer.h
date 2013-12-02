@@ -11,17 +11,26 @@
 
 #include <iostream>
 #include <GLUT/GLUT.h>
-#include <thread>
+#include <map>
+#include "Particle.h"
+
 class Simulator;
 class Renderer;
 static Renderer* currInstance;
 class Renderer {
   Simulator* sim;
+  //for debugging, to allow stepping through simulation
+  std::map<int,vector<Particle> >  particleHistory;
   public:
-    Renderer(Simulator*s) : sim(s) {};
+    int displayFrame = 0;
+    int numTimesteps;
+    Renderer(Simulator*s, int num) : sim(s), numTimesteps(num) {
+     particleHistory = std::map<int,vector<Particle> >();
+    };
     void initialize(int argc, const char * argv[]);
     static void myDisplay();
     void loop();
+    void updateParticles(int i);
 };
 
 

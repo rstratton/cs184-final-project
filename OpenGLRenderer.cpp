@@ -10,7 +10,7 @@
 #include "Simulator.h"
 #include <thread>
 void Renderer::myDisplay (){
-  Simulator* sim = currInstance->sim;
+  vector<Particle>*particles = &(currInstance->particleHistory[currInstance->displayFrame]);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);				// clear the color buffer
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
@@ -19,11 +19,12 @@ void Renderer::myDisplay (){
   glLoadIdentity();
   glColor3f(1, 0, 0);
   glBegin(GL_POINTS);
-  for(int i = 0; i < sim->allParticles.size(); i++) {
-    glVertex3f(sim->allParticles[i].position[0], sim->allParticles[i].position[1], sim->allParticles[i].position[2]);
+  for(int i = 0; i < particles->size(); i++) {
+    glVertex3f(particles->at(i).position[0], particles->at(i).position[1], particles->at(i).position[2]);
   }
   glEnd();
   
+  Simulator* sim = currInstance->sim;
   glColor3f(0, 0, 1);
   for(int i =0; i < sim->objects.size(); i++) {
     glBegin(GL_LINE_LOOP);
@@ -38,13 +39,24 @@ void Renderer::myDisplay (){
   glutSwapBuffers();					// swap buffers (we earlier set double buffer)
 }
 
+void Renderer::updateParticles(int i ) {
+  particleHistory[i] = sim->allParticles;
+}
+
 void keyPressed(unsigned char key, int x, int y) {
   if(key == ' ') {
     //case for spacebar
     exit(0);
   }
 }
-
+void specialKeyPressed(int key, int x, int y) {
+  if(key==GLUT_KEY_LEFT) {
+    currInstance->displayFrame = max(0, currInstance->displayFrame-10);
+  }else if(key==GLUT_KEY_RIGHT) {
+    currInstance->displayFrame = currInstance->displayFrame+10;
+  }
+  glutPostRedisplay();
+}
 void Renderer::loop() {
   glutMainLoop();
 }
@@ -64,6 +76,7 @@ void Renderer::initialize(int argc, const char * argv[]) {
   currInstance = this;
   glutDisplayFunc(Renderer::myDisplay);
   glutKeyboardFunc(keyPressed);
+  glutSpecialFunc(specialKeyPressed);
   glClearColor (0.0, 0.0, 0.0, 0.0);
 }
 
