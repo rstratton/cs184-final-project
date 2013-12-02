@@ -69,14 +69,15 @@ vector<Particle*> Simulator::getNeighborsForParticle(unsigned int i) {
 
 void Simulator::advanceTimeStep() {
   //float GAS_CONST = 8.3145;
-  float GAS_CONST = pow(1.3806, -23);
+  //float GAS_CONST = pow(1.3806, -23);
+  float GAS_CONST = fp.pressureConstant;
   float WATER_REST_DENSITY = 1000;
-  vector<float> pressures;
   for(int i = 0; i < allParticles.size(); i++) { //first loop to calculate pressure values for all particles
-    pressures.push_back(GAS_CONST * (pow(allParticles[i].calculateDensity(getNeighborsForParticle(i)) / WATER_REST_DENSITY, 7) - 1));
+    allParticles[i].neighbors = getNeighborsForParticle(i);
+    allParticles[i].pressure = GAS_CONST * (pow(allParticles[i].calculateDensity(allParticles[i].neighbors) / WATER_REST_DENSITY, 7) - 1);
   }
   for(int i = 0; i < allParticles.size(); i++) { //second loop to calculate new accelerations and forces
-    allParticles[i].calculateForces(getNeighborsForParticle(i), pressures); 
+    allParticles[i].calculateForces(); 
   }
   vector<int> toDelete = vector<int>();
   //now actually move the particles
@@ -143,8 +144,6 @@ void Simulator::addParticle(vec3 pos, FluidProperties fp) {
 #endif
 }
 
-
-
 float Simulator::kernelFunction(vec3 difference) {
   if(difference.length() > 2*properties.smoothing) {
     return 0;
@@ -156,3 +155,16 @@ float Simulator::kernelFunction(vec3 difference) {
   return term * e;
 }
 
+vec3 Simulator::pressureGradient(vec3 difference) {
+  if(difference.length() > properties.smoothing) {
+    return 0;
+  }
+  return -30/PI*pow(properties.smoothing,6.)*pow(properties.smoothing-difference.length,2.)*difference.normalize();
+}
+
+vec3 Simulator::viscosityGradient(vec3 difference) {
+  if(difference.length() > properties.smoothing) {
+    return 0;
+  }
+  return 45/PI*pow(properties.smoothing,6.)*(properties.smoothing-difference.length)*difference.normalize();
+}
