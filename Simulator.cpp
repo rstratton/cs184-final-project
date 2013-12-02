@@ -8,7 +8,7 @@
 
 #include "Simulator.h"
 //#define USE_ACCELERATION_STRUCTURES
-
+#include "Shape.h"
 using namespace std;
 
 void Simulator::initialize() {
@@ -77,8 +77,14 @@ void Simulator::advanceTimeStep() {
 #ifdef USE_ACCELERATION_STRUCTURES
     particleGrid[allParticles[i].gridPosition.x][allParticles[i].gridPosition.y][allParticles[i].gridPosition.z].remove(i);
 #endif
-    //move the particle
-    allParticles[i].advanceTimeStep(properties.timestep,numGridCells);
+    //check for object intersections
+    if(!checkObjectIntersection(i)) {
+      //if no intersection, just move it normally
+      allParticles[i].advanceTimeStep(properties.timestep,numGridCells);
+    } else {
+      printf("INTERSECTION \n \n \n ");
+    }
+
     
     //delete any that went offscreen
 #ifdef USE_ACCELERATION_STRUCTURES
@@ -104,6 +110,33 @@ void Simulator::advanceTimeStep() {
     allParticles.erase(allParticles.begin()+ (toDelete[i] - i)); //-i to deal with the offset of erasing the previous ones
   }
   
+}
+
+Ray getReflectedRay(Ray r, Intersection* intersect) {
+  vec4 inDir = r.direction;
+  inDir.normalize();
+  vec4 newDir = inDir - 2*(inDir*vec4(intersect->localGeo.normal,0))*vec4(intersect->localGeo.normal,0);
+  vec4 pos = intersect->localGeo.pos;
+  return Ray(pos,newDir,.001f,300);
+}
+
+bool Simulator::checkObjectIntersection(int i) {
+#ifdef USE_ACCELERATION_STRUCTURES
+  //have some optimized code here, perhaps AABB tree on the level of objects?
+#else
+  for(int j = 0; j < objects.size(); j++) {
+    Ray r = Ray(allParticles[i].position,allParticles[i].velocity,0,properties.timestep);
+    Intersection *in = (Intersection*) malloc(sizeof(Intersection));;
+    if(objects[j]->intersectsRay(r, in)) {
+      vec4 newDir = getReflectedRay(r, in).direction;
+      newDir.normalize();
+      newDir *= allParticles[i].velocity.length() * ((properties.timestep-in->t_value) / properties.timestep);
+      allParticles[i].velocity = newDir;
+      return true;
+    }
+  }
+#endif
+  return false;
 }
 
 

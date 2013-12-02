@@ -14,6 +14,7 @@
 #include "StaticObject.h"
 #include <vector>
 #include "Fluid.h"
+#include "BVH.h"
 using namespace std;
 
 //struct to avoid having a lot of arguments passed around
@@ -28,7 +29,7 @@ class SceneParser {
   void parseScene(string fileName);
   public:
     SceneProperties properties;
-    vector<StaticObject> objects;
+    vector<StaticObject*> objects;
     vector<FluidVolume> volumes;
     SceneParser(string fileName) {
       parseScene(fileName);

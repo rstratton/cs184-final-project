@@ -14,7 +14,7 @@
 
 void SceneParser::parseScene(string fileName) {
   //default values
-  objects = vector<StaticObject>();
+  objects = vector<StaticObject*>();
   volumes = vector<FluidVolume>();
   
   map<string, FluidProperties> definedFluids = map<string, FluidProperties>();
@@ -60,11 +60,11 @@ void SceneParser::parseScene(string fileName) {
         volumes.push_back(fv);
       } else if(splitline[0] == "object") {
         vec3 center = vec3(atof(splitline[2].c_str()),atof(splitline[3].c_str()),atof(splitline[4].c_str()));
-        StaticObject obj = StaticObject(splitline[1],center);
+        
+        objects.push_back(new StaticObject(splitline[1],center));
       } else {
         printf("unrecognized command: %s", splitline[0].c_str());
       }
-      
     }
     inpfile.close();
   }
