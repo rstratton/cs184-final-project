@@ -30,8 +30,9 @@ int main(int argc, const char * argv[])
 #include "Particle.h"
 #include "SceneParser.h"
 #include "Color.h"
-#include "StaticObject.h"
 #include "unistd.h"
+#include "OpenGLRenderer.h"
+#include <map>
 
 int main(int argc, const char * argv[])
 {
@@ -43,16 +44,23 @@ int main(int argc, const char * argv[])
   int numTimesteps = atoi(argv[2]);
   Simulator s1 = Simulator(p.properties, p.objects, p.volumes);
   s1.initialize();
+  Renderer r1 = Renderer(&s1, numTimesteps);
+  r1.initialize(argc, argv);
   
   
   for(int i = 0; i < numTimesteps; i++) {
     s1.advanceTimeStep();
     s1.printParticleGrid();
-    
+
+    if(i%10 ==0)
+      r1.updateParticles(i);
     //now something like:
     //reconstructor.reconstructSurface()
     //renderer.renderSurface()
   }
+
+  r1.loop();
+  
   
   std::cout << "Hello, World!\n";
     return 0;

@@ -10,14 +10,29 @@
 #define __final__StaticObject__
 #include <iostream>
 #include "algebra3.h"
+#include "Shape.h"
+#include "BVH.h"
 #include <vector>
 //this class defines the static objects in the scene the fluid will interact with.
 using namespace std;
+class Ray;
 class StaticObject {
-  vector<vector<vec3> > faces;
+  BVHNode* shapes = nullptr;
   vec3 mins = NULL;
   vec3 maxes = NULL;
+  ShapeProperties props;
   public:
+    std::vector<Shape*> faces;
     StaticObject(string filename, vec3 center);
+    bool intersectsRay(Ray& p, Intersection* in);
+    ~StaticObject() {
+      if(shapes != nullptr)
+        delete shapes;
+      for(int i = 0; i < faces.size();i++) {
+        delete (Triangle*)faces[i];
+      }
+    }
 };
 #endif /* defined(__final__StaticObject__) */
+
+

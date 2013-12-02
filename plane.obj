@@ -1,0 +1,10 @@
+# This file uses centimeters as units for non-parametric coordinates.
+
+g default
+v 0 0.000000 0
+v 100 50 0
+v 100 50 100
+v 0 0 100
+
+f 1/2 2/2 3/4
+f 1/2 2/2 4/4

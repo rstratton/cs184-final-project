@@ -7,12 +7,14 @@
 //
 
 #include "StaticObject.h"
-
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <stack>
+#include "Shape.h"
 
 StaticObject::StaticObject(string filename, vec3 center) {
+  faces = std::vector<Shape*>();
   //parse the obj file
   std::ifstream inpfile(filename.c_str());
   if(!inpfile.is_open()) {
@@ -20,7 +22,7 @@ StaticObject::StaticObject(string filename, vec3 center) {
     exit(1);
   } else {
     std::string line;
-    std::vector<vec3> vertices;
+    std::vector<vec3> vertices = std::vector<vec3>();
     while(inpfile.good()) {
       std::vector<std::string> splitline;
       std::string buf;
@@ -51,14 +53,28 @@ StaticObject::StaticObject(string filename, vec3 center) {
         }
         vertices.push_back(v);
       } else if(splitline[0] == "f") {
-        std::vector<vec3> vec = std::vector<vec3>();
-        for(int i = 1; i < splitline.size(); i++) {
-          std::string v1;
-          std::istringstream liness(splitline[i].c_str());
-          getline( liness, v1, '/' );
-          vec.push_back(vertices.at(atoi(v1.c_str())-1));
-        }
-        faces.push_back(vec);
+        //Will only be able to handle triangles
+        
+        string v1;
+        istringstream liness(splitline[1].c_str());
+        getline( liness, v1, '/' );
+        
+        string v2;
+        istringstream liness2(splitline[2].c_str());
+        getline( liness2, v2, '/' );
+        
+        string v3;
+        istringstream liness3(splitline[3].c_str());
+        getline( liness3, v3, '/' );
+        
+        int* indices = (int*)malloc(3*sizeof(int));
+        //Subtract 1 as the convention for .obj files is that the first vertex is at position 1
+        indices[0] =atoi(v1.c_str()) - 1;
+        indices[1] =atoi(v2.c_str()) - 1;
+        indices[2] =atoi(v3.c_str()) - 1;
+        faces.push_back(new Triangle(&vertices, indices,identity3D(), props));
+        free(indices);
+
       }
       else {
         //std::cerr << "Unknown command in current context: " << splitline[0] << std::endl;
@@ -67,5 +83,38 @@ StaticObject::StaticObject(string filename, vec3 center) {
     
     inpfile.close();
   }
+  shapes = new BVHNode(faces, 0);
 }
 
+
+
+bool StaticObject::intersectsRay(Ray& p, Intersection* in) {
+  //copy code from rayTracer...limit faces to be only triangles?
+  //first check this object's bounding box (determined by the union of its triangle's bounding boxes)
+  std::stack<BVHNode*> iterStack;
+  BVHNode* node = shapes;
+  while (!iterStack.empty() || !(node == NULL)) {
+    if(node->doesIntersect(p)) {
+      if(!(node->isLeaf)) {
+        if(node->rightChild != NULL) {
+          iterStack.push(node->rightChild);
+        }
+        if(node->leftChild != NULL) {
+          iterStack.push(node->leftChild);
+        }
+      } else { // check for real intersection
+        if(node->shape->intersect(p, in)) {
+          return true;
+        }
+      }
+    }
+    if(!iterStack.empty()) {
+      node = iterStack.top();
+      iterStack.pop();
+    } else {
+      node = NULL;
+    }
+  }
+  
+  return false;
+}

@@ -36,25 +36,34 @@ class Simulator {
   public:
     SceneProperties properties;
     //the objects the fluid will interact with
-    vector <StaticObject> objects;
+    vector <StaticObject*> objects;
     int numGridCells;    //calculated at initialization
     void initialize();
     void addParticle(vec3 pos, FluidProperties fp);
     void advanceTimeStep();
     void printParticleGrid();
-    Simulator(SceneProperties p, vector<StaticObject> obj, vector<FluidVolume> fv) : volumes(fv), properties(p) , objects(obj){};
+    Simulator(SceneProperties p, vector<StaticObject*> obj, vector<FluidVolume> fv) : volumes(fv), properties(p) , objects(obj){};
   
     //ability to initialize an empty one
-    Simulator() : volumes(vector<FluidVolume>()), properties(SceneProperties()) , objects(vector<StaticObject>()){};
+    Simulator() : volumes(vector<FluidVolume>()), properties(SceneProperties()) , objects(vector<StaticObject*>()){};
+    ~Simulator() {
+      for(int i = 0; i < objects.size(); i++) {
+        delete objects[i];
+      }
+      objects.clear();
+    }
 
 
   protected:
     friend struct Particle; //so particle can use these methods
+    friend class Renderer;
     float kernelFunction(vec3 difference); //simple gaussian for now
     vector<Particle> allParticles;
 
+
   private:
     vector<Particle*> getNeighborsForParticle(unsigned int i); //return a list of indices
+    bool checkObjectIntersection(int i);
   
 };
 
