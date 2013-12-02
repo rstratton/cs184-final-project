@@ -17,7 +17,7 @@
 using namespace std;
 class Ray;
 class StaticObject {
-  BVHNode* shapes = nullptr;
+  BVHNode* shapes;
   vec3 mins = NULL;
   vec3 maxes = NULL;
   ShapeProperties props;

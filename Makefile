@@ -1,6 +1,6 @@
 CC = g++
 RM = /bin/rm -rf
-OBJ_FILES = algebra3.o Fluid.o Particle.o SceneParser.o Simulator.o StaticObject.o Camera.o KeyboardHandlers.o Renderer.o ParticleInspector.o
+OBJ_FILES = algebra3.o Fluid.o Particle.o SceneParser.o Simulator.o StaticObject.o Camera.o KeyboardHandlers.o Renderer.o ParticleInspector.o BVH.o Shape.o
 
 ifeq ($(shell sw_vers 2>/dev/null | grep Mac | awk '{ print $$2}'),Mac)
     CFLAGS = -g -DGL_GLEXT_PROTOTYPES -I./include/ -I/usr/X11/include -DOSX

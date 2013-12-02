@@ -88,8 +88,6 @@ void Simulator::advanceTimeStep() {
     if(!checkObjectIntersection(i)) {
       //if no intersection, just move it normally
       allParticles[i].advanceTimeStep(properties.timestep,numGridCells);
-    } else {
-      printf("INTERSECTION \n \n \n ");
     }
 
     
