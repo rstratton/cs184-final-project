@@ -9,7 +9,7 @@
 #include "OpenGLRenderer.h"
 #include "Simulator.h"
 #include <thread>
-void Renderer::myDisplay (){
+void oglRenderer::myDisplay (){
   vector<Particle>*particles = &(currInstance->particleHistory[currInstance->displayFrame]);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);				// clear the color buffer
   glMatrixMode(GL_PROJECTION);
@@ -39,7 +39,7 @@ void Renderer::myDisplay (){
   glutSwapBuffers();					// swap buffers (we earlier set double buffer)
 }
 
-void Renderer::updateParticles(int i ) {
+void oglRenderer::updateParticles(int i ) {
   particleHistory[i] = sim->allParticles;
 }
 
@@ -57,11 +57,11 @@ void specialKeyPressed(int key, int x, int y) {
   }
   glutPostRedisplay();
 }
-void Renderer::loop() {
+void oglRenderer::loop() {
   glutMainLoop();
 }
 
-void Renderer::initialize(int argc, const char * argv[]) {
+void oglRenderer::initialize(int argc, const char * argv[]) {
   //This initializes glut
   glutInit(&argc, (char**) argv);
   //This tells glut to use a double-buffered window with red, green, and blue channels and a depth buffer

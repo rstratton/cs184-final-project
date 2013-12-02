@@ -48,8 +48,8 @@ void specialKeyCallback(int key, int x, int y) {
     handlers->specialKeyHandler(key, x, y);
 }
 
-ParticleInspector::ParticleInspector(vector<Particle> *particles) {
-    this->particles = particles;
+ParticleInspector::ParticleInspector(Simulator*s) {
+    this->sim = s;
 }
 
 void ParticleInspector::run(int argc, char** argv) {
@@ -72,8 +72,8 @@ void ParticleInspector::run(int argc, char** argv) {
     float maxX = FLT_MIN;
     float maxY = FLT_MIN;
     float maxZ = FLT_MIN;
-    for (int i = 0; i < particles->size(); ++i) {
-        vec3 pos = (*particles)[i].position;
+    for (int i = 0; i < sim->allParticles.size(); ++i) {
+        vec3 pos = sim->allParticles[i].position;
         minX = fmin(minX, pos[VX]);
         minY = fmin(minY, pos[VY]);
         minZ = fmin(minZ, pos[VZ]);
@@ -82,7 +82,7 @@ void ParticleInspector::run(int argc, char** argv) {
         maxZ = fmax(maxZ, pos[VZ]);
         sum = sum + pos;
     }
-    vec3 centroid = sum * (1.0 / (particles->size()));
+    vec3 centroid = sum * (1.0 / (sim->allParticles.size()));
 
     minX -= centroid[VX];
     maxX -= centroid[VX];
@@ -98,7 +98,7 @@ void ParticleInspector::run(int argc, char** argv) {
 
     camera = new Camera(0, 0, radius);
     objectOffset = new vec3(-centroid[VX], -centroid[VY], -centroid[VZ]);
-    renderer = new Renderer(camera, objectOffset, particles);
+    renderer = new Renderer(camera, objectOffset, sim);
     handlers = new KeyboardHandlers(camera, objectOffset, renderer);
 
 

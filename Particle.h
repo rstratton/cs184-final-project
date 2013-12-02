@@ -35,14 +35,14 @@ struct Particle {
   vec3 velocity;
   vec3 force;
   vec3 acceleration;
-  float pressure;
   vector <Particle*> neighbors;
+  float pressure;
   GridPosition gridPosition;
   Simulator* sim;
   Particle (vec3 initialPos, FluidProperties fluid, Simulator* s);
  
-  float calculateDensity(vector <Particle*> neighbors);
-  void calculateForces(vector <Particle*> neighbors);
+  float calculateDensity();
+  void calculateForces();
   void advanceTimeStep(float timestep, int numGridCells);
 };
 

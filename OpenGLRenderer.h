@@ -16,8 +16,8 @@
 
 class Simulator;
 class Renderer;
-static Renderer* currInstance;
-class Renderer {
+static oglRenderer* currInstance;
+class oglRenderer {
   Simulator* sim;
   //for debugging, to allow stepping through simulation
   std::map<int,vector<Particle> >  particleHistory;

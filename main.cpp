@@ -1,22 +1,3 @@
-<<<<<<< HEAD
-//
-//  main.cpp
-//  final
-//
-//  Created by Kavan Sikand on 11/19/13.
-//  Copyright (c) 2013 Kavan Sikand. All rights reserved.
-//
-
-#include <iostream>
-
-int main(int argc, const char * argv[])
-{
-
-  std::cout << "Hello, World!\n";
-    return 0;
-}
-
-=======
 //
 //  main.cpp
 //  final
@@ -31,10 +12,11 @@ int main(int argc, const char * argv[])
 #include "SceneParser.h"
 #include "Color.h"
 #include "unistd.h"
-#include "OpenGLRenderer.h"
+#include "Renderer.h"
+#include "ParticleInspector.h"
 #include <map>
 
-int main(int argc, const char * argv[])
+int main(int argc, char * argv[])
 {
   if(argc <= 2) {
     printf("not enough arguments \n");
@@ -44,26 +26,20 @@ int main(int argc, const char * argv[])
   int numTimesteps = atoi(argv[2]);
   Simulator s1 = Simulator(p.properties, p.objects, p.volumes);
   s1.initialize();
-  Renderer r1 = Renderer(&s1, numTimesteps);
-  r1.initialize(argc, argv);
+  ParticleInspector pi(&s1);
+  pi.run(argc, argv);
   
-  
-  for(int i = 0; i < numTimesteps; i++) {
-    s1.advanceTimeStep();
-    s1.printParticleGrid();
+//
+//  for(int i = 0; i < numTimesteps; i++) {
+//    s1.advanceTimeStep();
+//    s1.printParticleGrid();
+//    //now something like:
+//    //reconstructor.reconstructSurface()
+//    //renderer.renderSurface()
+//  }
 
-    if(i%10 ==0)
-      r1.updateParticles(i);
-    //now something like:
-    //reconstructor.reconstructSurface()
-    //renderer.renderSurface()
-  }
-
-  r1.loop();
   
   
   std::cout << "Hello, World!\n";
     return 0;
 }
-
->>>>>>> 182ad5ffef771cf5f310e7370297b7b0f0846fa8

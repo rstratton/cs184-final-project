@@ -19,11 +19,11 @@
 
 class ParticleInspector {
     public:
-        ParticleInspector(std::vector<Particle> *particles);
+        ParticleInspector(Simulator* s);
         void run(int argc, char** argv);
 
     private:
-        std::vector<Particle> *particles;
+        Simulator *sim;
 };
 
 #endif

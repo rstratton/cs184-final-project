@@ -57,7 +57,10 @@ class Simulator {
   protected:
     friend struct Particle; //so particle can use these methods
     friend class Renderer;
+    friend class ParticleInspector;
     float kernelFunction(vec3 difference); //simple gaussian for now
+    vec3 pressureGradient(vec3 difference);
+    vec3 viscosityGradient(vec3 difference);
     vector<Particle> allParticles;
 
 

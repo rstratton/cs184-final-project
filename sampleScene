@@ -17,7 +17,7 @@ fluid water 1 1 1 .6 .2 .2 .8 .7
 #volume water sphere 300 200 100 50 125
 
 #this one is a rectangle
-volume water rect 50 195 100 200 5 0 125
+volume water rect 100 195 100 50 15 20 625
 
 #to define static objects:
 #object keyword then filename (obj file defining faces) then x y z center

@@ -10,7 +10,7 @@
 #include "Simulator.h"
 
 
-float Particle::calculateDensity(){ //todo: USE LINKED LIST INSTEAD OF VECTOR
+float Particle::calculateDensity(){
   float sum = 0;
   for(int j = 0; j < neighbors.size(); j++) {
     sum += neighbors[j]->fp.mass*sim->kernelFunction(position - neighbors[j]->position);
@@ -18,15 +18,17 @@ float Particle::calculateDensity(){ //todo: USE LINKED LIST INSTEAD OF VECTOR
   return sum;
 }
 
-void Particle::calculateForces()  { //list of neighbors
-  float density = calculateDensity(neighbors);
-  vec3 pressureForce;
-  vec3 viscosityForce;
-  for(int i = 0; i < neighbors.length; i++) {
-    pressureForce -= (pressure + neighbors[i]->pressure)/2 * fp.mass/neighbors[i]->calculateDensity() * sim->pressureGradient(position - neighbors[i]->position);
-    viscosityForce += fp.viscosity * (neighbors[i]->velocity - velocity) * fp.mass/neighbors[i]->calculateDensity() * viscosityGradient(position - neighbors[i]->position);
-  }
-  force = pressureForce + viscosityForce + gravity*density; 
+void Particle::calculateForces()  {
+  float density = calculateDensity();
+  vec3 pressureForce = vec3();
+  vec3 viscosityForce = vec3();
+  //comment out for now, just to test rendering
+//  pressure = fp.pressureConstant*(pow(density/fp.restDensity,7)-1);
+//  for(int i = 0; i < neighbors.size(); i++) {
+//    pressureForce -= (pressure + neighbors[i]->pressure)/2 * neighbors[i]->fp.mass/neighbors[i]->calculateDensity() * sim->pressureGradient(position - neighbors[i]->position);
+//    viscosityForce += fp.viscosity * (neighbors[i]->velocity - velocity) * fp.mass/neighbors[i]->fp.mass * sim->viscosityGradient(position - neighbors[i]->position);
+//  }
+  force = pressureForce + viscosityForce + gravity*density;
   acceleration = force/density;
 }
 

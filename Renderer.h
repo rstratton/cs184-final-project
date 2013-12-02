@@ -6,12 +6,13 @@
 #include "algebra3.h"
 #include "Camera.h"
 #include "Particle.h"
-
+class Simulator;
 class Renderer {
     public:
-        std::vector<Particle>* particles;
-        Renderer(Camera* c, vec3* pos, std::vector<Particle>* particles);
+        Simulator* simulator;
+        Renderer(Camera* c, vec3* pos, Simulator* sim);
         void render();
+        void advance(int steps);
         void reshape(int w, int h);
 
     private:

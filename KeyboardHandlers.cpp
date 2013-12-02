@@ -21,6 +21,9 @@ void KeyboardHandlers::basicKeyHandler(unsigned char key, int x, int y) {
         case '-':
             camera->zoom(0.25f * camera->getRadius());
             break;
+        case 'n':
+            renderer->advance(10);
+            break;
     }
     // Redraw the scene
     glutPostRedisplay();
