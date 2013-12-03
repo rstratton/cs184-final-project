@@ -1,0 +1,25 @@
+size 1000 1000 1000
+
+timestep .01
+
+smoothing 10
+
+#fluid keyword defines a fluid with the given properties and associates it with the given name
+#format is 
+#fluid 	name 	mass 	viscosity 	pressureConstant 	elasticity 	restDensity 	r g b a
+fluid 	water 	1 		1 			1 					.6 			2			.2 	.2 	.8 	.7 
+
+#volume keyword. creates a volume of the specified fluid type.
+#format is volume fluidName volumeType [arguments]
+#for volumeType sphere, arguments are: centerX centerY centerZ radius numParticles
+#for volumeType box, arguments are: minX minY minZ lengthX lengthY lengthZ numParticles
+
+#this one is a sphere at the center with radius 50
+#volume water sphere 300 200 100 50 125
+
+#this one is a rectangle
+ volume water rect 100 195 100 100 100 100 125
+
+#to define static objects:
+#object keyword then filename (obj file defining faces) then x y z center
+object plane.obj 100 140 100
