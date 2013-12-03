@@ -7,7 +7,6 @@
 #include <string>
 #include <math.h>
 #include <stdlib.h>
-#include <GLUT/glut.h>
 #include "Camera.h"
 #include "Renderer.h"
 #include "KeyboardHandlers.h"

@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #ifdef OSX
 #include <GLUT/glut.h>
 #else

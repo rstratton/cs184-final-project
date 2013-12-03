@@ -189,7 +189,9 @@ vec3 Simulator::pressureGradient(vec3 difference) {
   if(difference.length() > 2*properties.smoothing || difference.length() == 0 ) {//you cant impact your own pressure??
     return 0;
   }
-  return -30/PI*pow(properties.smoothing,6.)*pow(properties.smoothing-difference.length(),2.)*difference.normalize();
+  vec3 grad(0.359174*difference[0]*exp((pow(difference[0],2.)+pow(difference[1],2.)+pow(difference[2],2.))/pow(properties.smoothing,2.))/pow(properties.smoothing,5.));
+  return grad;
+  //return -30/PI*pow(properties.smoothing,6.)*pow(properties.smoothing-difference.length(),2.)*difference.normalize();
 }
 
 vec3 Simulator::viscosityGradient(vec3 difference) {

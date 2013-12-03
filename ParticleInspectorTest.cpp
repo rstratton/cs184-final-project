@@ -1,4 +1,3 @@
-#include <GLUT/glut.h>
 #include "ParticleInspector.h"
 using namespace std;
 
