@@ -57,6 +57,7 @@ vector<Particle*> Simulator::getNeighborsForParticle(unsigned int i) {
 #else
   //naive, just iterate and check the distance
   for(int j = 0; j < allParticles.size(); j ++) {
+
     if((allParticles[j].position-p.position).length() < cutoff) {
       finalVector.push_back(&(allParticles[j]));
     }
@@ -70,10 +71,12 @@ vector<Particle*> Simulator::getNeighborsForParticle(unsigned int i) {
 void Simulator::advanceTimeStep() {
   //float GAS_CONST = 8.3145;
   //float GAS_CONST = pow(1.3806, -23);
-  float WATER_REST_DENSITY = 1000;
   for(int i = 0; i < allParticles.size(); i++) { //first loop to calculate pressure values for all particles
     allParticles[i].neighbors = getNeighborsForParticle(i);
-    allParticles[i].pressure = allParticles[i].fp.pressureConstant * (pow(allParticles[i].calculateDensity() / WATER_REST_DENSITY, 7) - 1);
+    allParticles[i].density = allParticles[i].calculateDensity();
+    printf("density: %f \n", allParticles[i].density);
+
+    allParticles[i].pressure = allParticles[i].fp.pressureConstant * (pow(allParticles[i].density / allParticles[i].fp.restDensity, 7) - 1);
   }
   for(int i = 0; i < allParticles.size(); i++) { //second loop to calculate new accelerations and forces
     allParticles[i].calculateForces(); 
@@ -175,9 +178,6 @@ void Simulator::addParticle(vec3 pos, FluidProperties fp) {
 }
 
 float Simulator::kernelFunction(vec3 difference) {
-  if(difference.length() > 2*properties.smoothing) {
-    return 0;
-  }
   //using one from the paper, a gaussian.
   float term =1/(pow(PI,1.5)*pow(properties.smoothing,3.));
   float e = exp(pow(difference.length(),2.)/pow(properties.smoothing,2.));
@@ -186,17 +186,11 @@ float Simulator::kernelFunction(vec3 difference) {
 }
 
 vec3 Simulator::pressureGradient(vec3 difference) {
-  if(difference.length() > 2*properties.smoothing || difference.length() == 0 ) {//you cant impact your own pressure??
-    return 0;
-  }
   vec3 grad(0.359174*difference[0]*exp((pow(difference[0],2.)+pow(difference[1],2.)+pow(difference[2],2.))/pow(properties.smoothing,2.))/pow(properties.smoothing,5.), 0.359174*difference[1]*exp((pow(difference[0],2.)+pow(difference[1],2.)+pow(difference[2],2.))/pow(properties.smoothing,2.))/pow(properties.smoothing,5.), 0.359174*difference[2]*exp((pow(difference[0],2.)+pow(difference[1],2.)+pow(difference[2],2.))/pow(properties.smoothing,2.))/pow(properties.smoothing,5.));
   return grad;
   //return -30/PI*pow(properties.smoothing,6.)*pow(properties.smoothing-difference.length(),2.)*difference.normalize();
 }
 
 vec3 Simulator::viscosityGradient(vec3 difference) {
-  if(difference.length() > 2*properties.smoothing || difference.length() == 0) {
-    return 0;
-  }
   return 45/PI*pow(properties.smoothing,6.)*(properties.smoothing-difference.length())*difference.normalize();
 }

@@ -1,12 +1,13 @@
-size 600 400 200
+size 1000 1000 1000
 
-timestep .01
+timestep .001
 
-smoothing 10
+smoothing 2
 
 #fluid keyword defines a fluid with the given properties and associates it with the given name
-#format is fluid name mass viscosity pressureConstant elasticity r g b a
-fluid water 1 1 1 .6 1 .2 .2 .8 .7 
+#format is 
+#fluid 	name 	mass 	viscosity 	pressureConstant 	elasticity 	restDensity 	r g b a
+fluid 	water 	1 		1 			1 					.6 			2			.2 	.2 	.8 	.7 
 
 #volume keyword. creates a volume of the specified fluid type.
 #format is volume fluidName volumeType [arguments]
@@ -17,8 +18,8 @@ fluid water 1 1 1 .6 1 .2 .2 .8 .7
 #volume water sphere 300 200 100 50 125
 
 #this one is a rectangle
-volume water rect 100 195 100 50 15 20 625
+ volume water rect 100 195 100 2 2 2 30
 
 #to define static objects:
 #object keyword then filename (obj file defining faces) then x y z center
-object plane.obj 100 140 100
+#object plane.obj 100 140 100

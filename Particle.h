@@ -37,6 +37,7 @@ struct Particle {
   vec3 acceleration;
   vector <Particle*> neighbors;
   float pressure;
+  float density;
   GridPosition gridPosition;
   Simulator* sim;
   Particle (vec3 initialPos, FluidProperties fluid, Simulator* s);

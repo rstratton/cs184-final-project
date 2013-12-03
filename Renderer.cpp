@@ -1,7 +1,7 @@
 #include <string>
 #include <vector>
 #include <stdlib.h>
-#ifdef OSX
+#if defined(OSX) || defined(__APPLE__)
 #include <GLUT/glut.h>
 #else
 #include <GL/glut.h>
@@ -23,7 +23,19 @@ Renderer::Renderer(Camera* c, vec3* pos, Simulator* sim) {
 }
 
 void drawParticle(Particle& particle) {
+  glBegin(GL_POINTS);
+
     glVertex3f(particle.position[VX], particle.position[VY], particle.position[VZ]);
+  glEnd();
+
+    glBegin(GL_LINE_LOOP);
+  glColor3f(0,0,1);
+
+    glVertex3f(particle.position[VX], particle.position[VY], particle.position[VZ]);
+  glColor3f(0,1,0);
+
+    glVertex3f(particle.position[VX] + particle.acceleration[VX], particle.position[VY] + particle.acceleration[VY], particle.position[VZ] + particle.acceleration[VZ]);
+    glEnd();
 }
 
 void Renderer::render() {
@@ -44,11 +56,9 @@ void Renderer::render() {
     glTranslatef(x, y, z);
   
     glColor3f(0, 1, 0);
-    glBegin(GL_POINTS);
     for (int i = 0; i < simulator->allParticles.size(); ++i) {
         drawParticle(simulator->allParticles[i]);
     }
-    glEnd();
   
     glColor3f(0, 0, 1);
     for(int i =0; i < simulator->objects.size(); i++) {
@@ -60,7 +70,22 @@ void Renderer::render() {
       }
       glEnd();
     }
+  glColor3f(0, 0, 1);
+    glBegin(GL_LINE_LOOP);
+    glVertex3f(0, 0, 0);
+    glVertex3f(0, 0, 1000);
+    glEnd();
+  glColor3f(1, 0, 0);
 
+    glBegin(GL_LINE_LOOP);
+    glVertex3f(0, 0, 0);
+    glVertex3f(1000, 0, 0);
+    glEnd();
+  glColor3f(0, 1, 0);
+glBegin(GL_LINE_LOOP);
+    glVertex3f(0, 0, 0);
+    glVertex3f(0, 1000, 0);
+    glEnd();
     // Set the drawn scene to the display buffer
     glutSwapBuffers();
     glFlush();

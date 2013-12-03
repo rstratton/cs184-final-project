@@ -1,7 +1,7 @@
 #include <math.h>
 
 #include <stdlib.h>
-#ifdef OSX
+#if defined(OSX) || defined(__APPLE__)
 #include <GLUT/glut.h>
 #else
 #include <GL/glut.h>
