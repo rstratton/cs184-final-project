@@ -13,6 +13,11 @@
 #include "Shape.h"
 #include "BVH.h"
 #include <vector>
+
+#ifndef nullptr
+#define nullptr NULL
+#endif
+
 //this class defines the static objects in the scene the fluid will interact with.
 using namespace std;
 class Ray;
