@@ -194,9 +194,10 @@ vec3 Simulator::pressureGradient(vec3 difference) {
   //return -30/PI*pow(properties.smoothing,6.)*pow(properties.smoothing-difference.length(),2.)*difference.normalize();
 }
 
-vec3 Simulator::viscosityGradient(vec3 difference) {
+float Simulator::viscosity(vec3 difference) {
   if(difference.length() > 2*properties.smoothing || difference.length() == 0) {
     return 0;
   }
-  return 45/PI*pow(properties.smoothing,6.)*(properties.smoothing-difference.length())*difference.normalize();
+  return (1.07752*pow(properties.smoothing,2.)+0.718348*pow(difference[0],2.)+0.718348*pow(difference[1],2.)+0.718348*pow(difference[2],2.))*exp((pow(difference[0],2.)+pow(difference[1],2.)+pow(difference[2],2.))/pow(properties.smoothing,2.))/pow(properties.smoothing,7.);
+  //return 45/PI*pow(properties.smoothing,6.)*(properties.smoothing-difference.length())*difference.normalize();
 }
