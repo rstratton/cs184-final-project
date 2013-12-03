@@ -4,7 +4,14 @@
 #include <string>
 #include <math.h>
 #include <stdlib.h>
+
+#ifdef OSX
 #include <GLUT/glut.h>
+#else
+#include <GL/glut.h>
+#include <GL/glu.h>
+#endif
+
 #include "Camera.h"
 #include "Renderer.h"
 #include "KeyboardHandlers.h"

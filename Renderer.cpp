@@ -1,6 +1,13 @@
 #include <string>
 #include <vector>
+
+#ifdef OSX
 #include <GLUT/glut.h>
+#else
+#include <GL/glut.h>
+#include <GL/glu.h>
+#endif
+
 #include "Renderer.h"
 #include "algebra3.h"
 #include "Camera.h"

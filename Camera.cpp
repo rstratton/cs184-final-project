@@ -1,5 +1,12 @@
 #include <math.h>
+
+#ifdef OSX
 #include <GLUT/glut.h>
+#else
+#include <GL/glut.h>
+#include <GL/glu.h>
+#endif
+
 #include "Camera.h"
 #include "algebra3.h"
 
