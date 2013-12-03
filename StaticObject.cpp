@@ -15,6 +15,8 @@
 
 StaticObject::StaticObject(string filename, vec3 center) {
   shapes = nullptr;
+  mins = NULL;
+  maxes = NULL;
   faces = std::vector<Shape*>();
   //parse the obj file
   std::ifstream inpfile(filename.c_str());

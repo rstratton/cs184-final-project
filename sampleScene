@@ -6,7 +6,7 @@ smoothing 10
 
 #fluid keyword defines a fluid with the given properties and associates it with the given name
 #format is fluid name mass viscosity pressureConstant elasticity r g b a
-fluid water 1 1 1 .6 .2 .2 .8 .7 
+fluid water 1 1 1 .6 1 .2 .2 .8 .7 
 
 #volume keyword. creates a volume of the specified fluid type.
 #format is volume fluidName volumeType [arguments]

@@ -18,8 +18,8 @@ using namespace std;
 class Ray;
 class StaticObject {
   BVHNode* shapes;
-  vec3 mins = NULL;
-  vec3 maxes = NULL;
+  vec3 mins;
+  vec3 maxes;
   ShapeProperties props;
   public:
     std::vector<Shape*> faces;
