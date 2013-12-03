@@ -74,7 +74,7 @@ void Simulator::advanceTimeStep() {
   for(int i = 0; i < allParticles.size(); i++) { //first loop to calculate pressure values for all particles
     allParticles[i].neighbors = getNeighborsForParticle(i);
     allParticles[i].density = allParticles[i].calculateDensity();
-    printf("density: %f \n", allParticles[i].density);
+//    printf("density: %f \n", allParticles[i].density);
 
     allParticles[i].pressure = allParticles[i].fp.pressureConstant * (pow(allParticles[i].density / allParticles[i].fp.restDensity, 7) - 1);
   }
