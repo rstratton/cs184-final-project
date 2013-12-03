@@ -14,10 +14,6 @@ using namespace std;
 void Simulator::initialize() {
   allParticles = vector<Particle> ();
   
-  //set up the fluid at the initial state
-  for(int i = 0; i < volumes.size(); i ++) {
-    volumes[i].populateFluid(this); //puts the particles evenly spaced through the fluid volume.
-  }
   
   //figure out the size for the grid
   cutoff = 2*properties.smoothing;
@@ -38,6 +34,11 @@ void Simulator::initialize() {
   }
   nextParticleGrid = particleGrid;
 #endif
+  
+  //set up the fluid at the initial state
+  for(int i = 0; i < volumes.size(); i ++) {
+    volumes[i].populateFluid(this); //puts the particles evenly spaced through the fluid volume.
+  }
 }
 
 vector<Particle*> Simulator::getNeighborsForParticle(unsigned int i) {
@@ -72,14 +73,13 @@ void Simulator::advanceTimeStep() {
   //float GAS_CONST = 8.3145;
   //float GAS_CONST = pow(1.3806, -23);
   for(int i = 0; i < allParticles.size(); i++) { //first loop to calculate pressure values for all particles
-    allParticles[i].neighbors = getNeighborsForParticle(i);
-    allParticles[i].density = allParticles[i].calculateDensity();
+    allParticles[i].density = allParticles[i].calculateDensity(getNeighborsForParticle(i));
 //    printf("density: %f \n", allParticles[i].density);
 
-    allParticles[i].pressure = allParticles[i].fp.pressureConstant * (pow(allParticles[i].density / allParticles[i].fp.restDensity, 7) - 1);
+    allParticles[i].pressure = allParticles[i].fp->pressureConstant * (pow(allParticles[i].density / allParticles[i].fp->restDensity, 7) - 1);
   }
   for(int i = 0; i < allParticles.size(); i++) { //second loop to calculate new accelerations and forces
-    allParticles[i].calculateForces(); 
+    allParticles[i].calculateForces(getNeighborsForParticle(i));
   }
   vector<int> toDelete = vector<int>();
   //now actually move the particles
@@ -138,7 +138,7 @@ bool Simulator::checkObjectIntersection(int i) {
     if(objects[j]->intersectsRay(r, in)) {
       vec4 newDir = getReflectedRay(r, in).direction;
       newDir.normalize();
-      newDir *= allParticles[i].fp.elasticity * allParticles[i].velocity.length() * ((properties.timestep-in->t_value) / properties.timestep);
+      newDir *= allParticles[i].fp->elasticity * allParticles[i].velocity.length() * ((properties.timestep-in->t_value) / properties.timestep);
       allParticles[i].velocity = newDir;
       return true;
     }
@@ -169,7 +169,7 @@ void Simulator::printParticleGrid() {
 }
 
 //create a new particle at this position
-void Simulator::addParticle(vec3 pos, FluidProperties fp) {
+void Simulator::addParticle(vec3 pos, FluidProperties* fp) {
   Particle p =  Particle(pos, fp, this);
   allParticles.push_back(p);
 #ifdef USE_ACCELERATION_STRUCTURES

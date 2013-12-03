@@ -13,7 +13,7 @@ void FluidVolume::populateFluid(Simulator* sim) {
   //now actually populate the fluid
   //for now just add a particle
   for(int i = 0; i < points.size(); i++) {
-    sim->addParticle(points[i], fluid);
+    sim->addParticle(points[i], &fluid);
   }
 }
 

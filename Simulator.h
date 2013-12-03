@@ -39,7 +39,7 @@ class Simulator {
     vector <StaticObject*> objects;
     int numGridCells;    //calculated at initialization
     void initialize();
-    void addParticle(vec3 pos, FluidProperties fp);
+    void addParticle(vec3 pos, FluidProperties* fp);
     void advanceTimeStep();
     void printParticleGrid();
     Simulator(SceneProperties p, vector<StaticObject*> obj, vector<FluidVolume> fv) : volumes(fv), properties(p) , objects(obj){};

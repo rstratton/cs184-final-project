@@ -18,12 +18,12 @@
 
 int main(int argc, char * argv[])
 {
-//  if(argc <= 2) {
-//    printf("not enough arguments \n");
-//    exit(1);
-//  }
+  if(argc <= 1) {
+    printf("not enough arguments \n");
+    exit(1);
+  }
   SceneParser p = SceneParser(argv[1]); //parses on construction
-  int numTimesteps = atoi(argv[2]);
+//  int numTimesteps = atoi(argv[2]);
   Simulator s1 = Simulator(p.properties, p.objects, p.volumes);
   s1.initialize();
 //  s1.addParticle(vec3(200,51,50), FluidProperties(1, 1, 1, 1, 1, Color(1,0,0,0)));

@@ -30,20 +30,19 @@ struct GridPosition {
 static vec3 gravity = vec3(0,-9.8,0); //in m/s/s
 
 struct Particle {
-  FluidProperties fp;
+  FluidProperties* fp;
   vec3 position;
   vec3 velocity;
   vec3 force;
   vec3 acceleration;
-  vector <Particle*> neighbors;
   float pressure;
   float density;
   GridPosition gridPosition;
   Simulator* sim;
-  Particle (vec3 initialPos, FluidProperties fluid, Simulator* s);
+  Particle (vec3 initialPos, FluidProperties* fluid, Simulator* s);
  
-  float calculateDensity();
-  void calculateForces();
+  float calculateDensity(vector <Particle*> neighbors);
+  void calculateForces(vector <Particle*> neighbors);
   void advanceTimeStep(float timestep, int numGridCells);
 };
 
