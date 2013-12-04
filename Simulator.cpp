@@ -18,6 +18,8 @@ void Simulator::initialize() {
   //figure out the size for the grid
   cutoff = properties.smoothing;
   numGridCells = vec3(ceil(properties.worldSize[0] / cutoff),ceil(properties.worldSize[1] / cutoff),ceil(properties.worldSize[2] / cutoff));
+  kernelCoeff = 1.56668147/pow(properties.smoothing,9.);
+  
   
   //initialize the grid
 #ifdef USE_ACCELERATION_STRUCTURES
@@ -67,12 +69,14 @@ vector<int> Simulator::getNeighborsForParticle(unsigned int i) {
   Particle p = allParticles[i];
 #ifdef USE_ACCELERATION_STRUCTURES
   //using 3x3 array for now
-  for(int x = max(p.gridPosition.x -1,0); x <= fmin(p.gridPosition.x + 1.,numGridCells[0]); x++) {
-    for(int y = max(p.gridPosition.y -1,0); y <= fmin(p.gridPosition.y + 1.,numGridCells[1]); y++) {
-      for(int z = max(p.gridPosition.z-1,0); z <= fmin(p.gridPosition.z + 1.,numGridCells[2]); z++) {
+  for(int x = max(p.gridPosition.x -1,0); x <= fmin(p.gridPosition.x + 1.,numGridCells[0]-1); x++) {
+    for(int y = max(p.gridPosition.y -1,0); y <= fmin(p.gridPosition.y + 1.,numGridCells[1]-1); y++) {
+      for(int z = max(p.gridPosition.z-1,0); z <= fmin(p.gridPosition.z + 1.,numGridCells[2]-1); z++) {
         for(std::list<unsigned int>::const_iterator iterator = particleGrid[x][y][z].begin(), end = particleGrid[x][y][z].end(); iterator != end; ++iterator) {
-          if((allParticles[i].position - allParticles[*iterator].position).length() < cutoff && *iterator != i)
+          if((allParticles[i].position - allParticles[*iterator].position).length() < cutoff && *iterator != i) {
             finalVector.push_back(*iterator);
+          }
+          
         }
       }
     }
@@ -154,9 +158,6 @@ Ray getReflectedRay(Ray r, Intersection* intersect) {
 }
 
 bool Simulator::checkObjectIntersection(int i) {
-#ifdef USE_ACCELERATION_STRUCTURES
-  //have some optimized code here, perhaps AABB tree on the level of objects?
-#else
   for(int j = 0; j < objects.size(); j++) {
     Ray r = Ray(allParticles[i].position,allParticles[i].velocity,0,properties.timestep);
     Intersection *in = (Intersection*) malloc(sizeof(Intersection));;
@@ -164,7 +165,6 @@ bool Simulator::checkObjectIntersection(int i) {
       return true;
     }
   }
-#endif
   return false;
 }
 
@@ -210,7 +210,7 @@ float Simulator::kernelFunction(vec3 difference) {
 
   //using cubic kernal:
   //return 315/(64*PI*pow(properties.smoothing,9.))*pow(pow(properties.smoothing,2.)-pow(difference.length,2.),3.)
-  return 1.56668147/pow(properties.smoothing,9.)*pow(pow(properties.smoothing,2.)-pow(difference.length(),2.),3.);
+  return kernelCoeff*pow(pow(properties.smoothing,2.)-pow(difference.length(),2.),3.);
 }
 
 vec3 Simulator::pressureGradient(vec3 difference) {
@@ -219,8 +219,8 @@ vec3 Simulator::pressureGradient(vec3 difference) {
   }
   //vec3 grad(0.359174*difference[0]*exp((pow(difference[0],2.)+pow(difference[1],2.)+pow(difference[2],2.))/pow(properties.smoothing,2.))/pow(properties.smoothing,5.), 0.359174*difference[1]*exp((pow(difference[0],2.)+pow(difference[1],2.)+pow(difference[2],2.))/pow(properties.smoothing,2.))/pow(properties.smoothing,5.), 0.359174*difference[2]*exp((pow(difference[0],2.)+pow(difference[1],2.)+pow(difference[2],2.))/pow(properties.smoothing,2.))/pow(properties.smoothing,5.));
   //use non-exponential kernal:
-  vec3 grad(-14.32394488*difference[0]*pow(properties.smoothing-difference.length(),2.)/(pow(properties.smoothing,6.)*difference.length()),-14.32394488*difference[1]*pow(properties.smoothing-difference.length(),2.)/(pow(properties.smoothing,6.)*difference.length()),-14.32394488*difference[2]*pow(properties.smoothing-difference.length(),2.)/(pow(properties.smoothing,6.)*difference.length()));
-  return grad;
+  float coeff = -14.32394488*pow(properties.smoothing-difference.length(),2.)/(pow(properties.smoothing,6.)*difference.length());
+  return vec3(difference[0]*coeff,difference[1]*coeff,difference[2]*coeff);
   //return -30/PI*pow(properties.smoothing,6.)*pow(properties.smoothing-difference.length(),2.)*difference.normalize();
 }
 

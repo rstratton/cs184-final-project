@@ -34,17 +34,17 @@ int main(int argc, char * argv[])
 //  s1.addParticle(vec3(200,49,50), fp);
 //  s1.addParticle(vec3(199,50,50), fp);
 
-  ParticleInspector pi(&s1);
-  pi.run(argc, argv);
+//  ParticleInspector pi(&s1);
+//  pi.run(argc, argv);
   
 
-//  for(int i = 0; i < numTimesteps; i++) {
-//    s1.advanceTimeStep();
-////    s1.printParticleGrid();
-//    //now something like:
-//    //reconstructor.reconstructSurface()
-//    //renderer.renderSurface()
-//  }
+  for(int i = 0; i < numTimesteps; i++) {
+    s1.advanceTimeStep();
+//    s1.printParticleGrid();
+    //now something like:
+    //reconstructor.reconstructSurface()
+    //renderer.renderSurface()
+  }
 
   
   

@@ -69,6 +69,7 @@ class Simulator {
     float calculateParticleDensity(int i, vector<int>* neighbors);
     void  calculateParticleForces(int i, vector<int>* neighbors);
     bool checkObjectIntersection(int i);
+  float kernelCoeff;
   
 };
 
