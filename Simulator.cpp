@@ -90,7 +90,7 @@ vector<int> Simulator::getNeighborsForParticle(unsigned int i) {
 void Simulator::advanceTimeStep() {
   //float GAS_CONST = 8.3145;
   //float GAS_CONST = pow(1.3806, -23);
-  vector<vector<int>> neighbors = vector<vector<int>>();
+  vector< vector<int> > neighbors = vector< vector<int> >();
   for(int i = 0; i < allParticles.size(); i++) { //first loop to calculate pressure values for all particles
     
     neighbors.push_back(getNeighborsForParticle(i));
