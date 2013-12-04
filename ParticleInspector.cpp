@@ -101,7 +101,7 @@ void ParticleInspector::run(int argc, char** argv) {
     max_distance = fmax(fabs(minX), fabs(maxX));
     max_distance = fmax(max_distance, fabs(minZ));
     max_distance = fmax(max_distance, fabs(maxZ));
-    float radius =  2 * (1 / tan(22.5 * (PI / 180))) * max_distance + maxY;
+    float radius =  2 * (1 / tan((35.0 / 2) * (PI / 180))) * max_distance + maxY;
 
     camera = new Camera(0, 0, radius);
     objectOffset = new vec3(-centroid[VX], -centroid[VY], -centroid[VZ]);

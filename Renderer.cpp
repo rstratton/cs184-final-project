@@ -62,10 +62,12 @@ void Renderer::render() {
   
     glColor3f(0, 0, 1);
     for(int i =0; i < simulator->objects.size(); i++) {
-      glBegin(GL_LINE_LOOP);
+      //glBegin(GL_LINE_LOOP);
+      glBegin(GL_LINES);
       for(int j = 0; j < simulator->objects[i]->faces.size(); j++) {
         for(int k = 0; k < ((Triangle*)simulator->objects[i]->faces[j])->vertices.size(); k++) {
           glVertex3f(((Triangle*)simulator->objects[i]->faces[j])->vertices[k][0], ((Triangle*)simulator->objects[i]->faces[j])->vertices[k][1],((Triangle*)simulator->objects[i]->faces[j])->vertices[k][2]);
+          glVertex3f(((Triangle*)simulator->objects[i]->faces[j])->vertices[(k+1)%3][0], ((Triangle*)simulator->objects[i]->faces[j])->vertices[(k+1)%3][1],((Triangle*)simulator->objects[i]->faces[j])->vertices[(k+1)%3][2]);
         }
       }
       glEnd();
@@ -101,7 +103,7 @@ void Renderer::reshape(int w, int h) {
     glLoadIdentity();
     glViewport(0, 0, w, h);
     // Use a FOV of 45 degrees.  Set the near/far clipping plane to 1/1000
-    gluPerspective(45, ratio, 0.1, 1000);
+    gluPerspective(35, ratio, 0.1, 100000);
     glMatrixMode(GL_MODELVIEW);
 }
 
