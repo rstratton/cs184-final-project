@@ -40,7 +40,7 @@ struct Particle {
   Simulator* sim;
   Particle (vec3 initialPos, FluidProperties* fluid, Simulator* s);
  
-  void advanceTimeStep(float timestep, int numGridCells);
+  void advanceTimeStep(float timestep, vec3 numGridCells);
 };
 
 #endif /* defined(__final__Particle__) */

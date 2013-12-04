@@ -37,7 +37,7 @@ class Simulator {
     SceneProperties properties;
     //the objects the fluid will interact with
     vector <StaticObject*> objects;
-    int numGridCells;    //calculated at initialization
+    vec3 numGridCells;    //calculated at initialization
     void initialize();
     void addParticle(vec3 pos, FluidProperties* fp);
     void advanceTimeStep();

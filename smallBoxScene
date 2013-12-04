@@ -1,0 +1,17 @@
+size 20 60 20
+
+timestep .001
+
+smoothing 3
+
+#10 x 10 x 10 box
+#1000 particles in a 5 x 20 x 5 initial volume (takes up half the volume)
+#1 particle per unit
+#so rest density = mass = 10
+
+object tub.obj 5 5 5
+
+#fluid 	name 	mass 	viscosity 	pressureConstant 	elasticity 	restDensity 	r g b a
+fluid 	water 	1 		1 			1 					.6 			1				.2 	.2 	.8 	.7 
+
+volume water rect 7.5 7.5 7.5 5 20 5

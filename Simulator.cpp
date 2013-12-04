@@ -7,7 +7,7 @@
 //
 
 #include "Simulator.h"
-//#define USE_ACCELERATION_STRUCTURES
+#define USE_ACCELERATION_STRUCTURES
 #include "Shape.h"
 using namespace std;
 
@@ -16,18 +16,17 @@ void Simulator::initialize() {
   
   
   //figure out the size for the grid
-  cutoff = 2*properties.smoothing;
-  float max = fmax(fmax(properties.worldSize[0],properties.worldSize[1]),properties.worldSize[2]);
-  numGridCells = floorf(max / cutoff); //n
+  cutoff = properties.smoothing;
+  numGridCells = vec3(ceil(properties.worldSize[0] / cutoff),ceil(properties.worldSize[1] / cutoff),ceil(properties.worldSize[2] / cutoff));
   
   //initialize the grid
 #ifdef USE_ACCELERATION_STRUCTURES
   particleGrid = vector< vector<vector<list<unsigned int> > > >();
-  for(int i = 0; i < numGridCells; i++) {
+  for(int i = 0; i < numGridCells[0]; i++) {
     particleGrid.push_back(vector<vector<list<unsigned int> > >());
-    for(int j = 0; j < numGridCells; j ++) {
+    for(int j = 0; j < numGridCells[1]; j ++) {
       particleGrid[i].push_back(vector<list<unsigned int> >());
-      for(int k = 0; k < numGridCells; k++) {
+      for(int k = 0; k < numGridCells[2]; k++) {
         particleGrid[i][j].push_back(list<unsigned int>());
       }
     }
@@ -59,7 +58,7 @@ void Simulator::calculateParticleForces(int i, vector<int>* neighbors)  {
     }
   }
   
-  vec3 force = -pressureForce;// + viscosityForce + gravity*density;
+  vec3 force = gravity*allParticles[i].density-pressureForce;// + viscosityForce + gravity*density;
   allParticles[i].acceleration = force/allParticles[i].density;
 }
 
@@ -68,11 +67,12 @@ vector<int> Simulator::getNeighborsForParticle(unsigned int i) {
   Particle p = allParticles[i];
 #ifdef USE_ACCELERATION_STRUCTURES
   //using 3x3 array for now
-  for(int x = max(p.gridPosition.x -1,0); x <= min(p.gridPosition.x + 1,numGridCells); x++) {
-    for(int y = max(p.gridPosition.y -1,0); y <= min(p.gridPosition.y + 1,numGridCells); y++) {
-      for(int z = max(p.gridPosition.z-1,0); z <= min(p.gridPosition.z + 1,numGridCells); z++) {
+  for(int x = max(p.gridPosition.x -1,0); x <= fmin(p.gridPosition.x + 1.,numGridCells[0]); x++) {
+    for(int y = max(p.gridPosition.y -1,0); y <= fmin(p.gridPosition.y + 1.,numGridCells[1]); y++) {
+      for(int z = max(p.gridPosition.z-1,0); z <= fmin(p.gridPosition.z + 1.,numGridCells[2]); z++) {
         for(std::list<unsigned int>::const_iterator iterator = particleGrid[x][y][z].begin(), end = particleGrid[x][y][z].end(); iterator != end; ++iterator) {
-          finalVector.push_back(*iterator);
+          if((allParticles[i].position - allParticles[*iterator].position).length() < cutoff && *iterator != i)
+            finalVector.push_back(*iterator);
         }
       }
     }
@@ -80,7 +80,6 @@ vector<int> Simulator::getNeighborsForParticle(unsigned int i) {
 #else
   //naive, just iterate and check the distance
   for(int j = 0; j < allParticles.size(); j ++) {
-
     if((allParticles[j].position-p.position).length() < cutoff && i != j) {
       finalVector.push_back(j);
     }
@@ -123,8 +122,8 @@ void Simulator::advanceTimeStep() {
     //delete any that went offscreen
 #ifdef USE_ACCELERATION_STRUCTURES
     if(allParticles[i].gridPosition.x >= 0 && allParticles[i].gridPosition.y >= 0
-       && allParticles[i].gridPosition.z >= 0 && allParticles[i].gridPosition.x < numGridCells
-       && allParticles[i].gridPosition.y < numGridCells && allParticles[i].gridPosition.z < numGridCells)
+       && allParticles[i].gridPosition.z >= 0 && allParticles[i].gridPosition.x < numGridCells[0]
+       && allParticles[i].gridPosition.y < numGridCells[1] && allParticles[i].gridPosition.z < numGridCells[2])
     {
       particleGrid[allParticles[i].gridPosition.x][allParticles[i].gridPosition.y][allParticles[i].gridPosition.z].push_back(i);
     } else {
@@ -174,8 +173,8 @@ bool Simulator::checkObjectIntersection(int i) {
 void Simulator::printParticleGrid() {
   
 #ifdef USE_ACCELERATION_STRUCTURES
-  for(int y = 0; y < numGridCells; y++) {
-    for(int x = 0; x < numGridCells; x++) {
+  for(int y = 0; y < numGridCells[1]; y++) {
+    for(int x = 0; x < numGridCells[0]; x++) {
       printf("%lu \t", particleGrid[x][y][0].size());
     }
     printf("\n");

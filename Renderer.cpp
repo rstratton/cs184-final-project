@@ -28,14 +28,14 @@ void drawParticle(Particle& particle) {
     glVertex3f(particle.position[VX], particle.position[VY], particle.position[VZ]);
   glEnd();
 
-    glBegin(GL_LINE_LOOP);
-  glColor3f(0,0,1);
-
-    glVertex3f(particle.position[VX], particle.position[VY], particle.position[VZ]);
-  glColor3f(0,1,0);
-
-    glVertex3f(particle.position[VX] + particle.acceleration[VX], particle.position[VY] + particle.acceleration[VY], particle.position[VZ] + particle.acceleration[VZ]);
-    glEnd();
+//    glBegin(GL_LINE_LOOP);
+//  glColor3f(0,0,1);
+//
+//    glVertex3f(particle.position[VX], particle.position[VY], particle.position[VZ]);
+//  glColor3f(0,1,0);
+//
+//    glVertex3f(particle.position[VX] + particle.acceleration[VX], particle.position[VY] + particle.acceleration[VY], particle.position[VZ] + particle.acceleration[VZ]);
+//    glEnd();
 }
 
 void Renderer::render() {
