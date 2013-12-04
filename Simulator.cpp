@@ -179,14 +179,20 @@ void Simulator::addParticle(vec3 pos, FluidProperties fp) {
 
 float Simulator::kernelFunction(vec3 difference) {
   //using one from the paper, a gaussian.
-  float term =1/(pow(PI,1.5)*pow(properties.smoothing,3.));
-  float e = exp(pow(difference.length(),2.)/pow(properties.smoothing,2.));
+  //float term =1/(pow(PI,1.5)*pow(properties.smoothing,3.));
+  //float e = exp(pow(difference.length(),2.)/pow(properties.smoothing,2.));
   
-  return term * e;
+  //return term * e;
+
+  //using cubic kernal:
+  //return 315/(64*PI*pow(properties.smoothing,9.))*pow(pow(properties.smoothing,2.)-pow(difference.length,2.),3.)
+  return 1.56668147/pow(properties.smoothing,9.)*pow(pow(properties.smoothing,2.)-pow(difference.length,2.),3.)
 }
 
 vec3 Simulator::pressureGradient(vec3 difference) {
-  vec3 grad(0.359174*difference[0]*exp((pow(difference[0],2.)+pow(difference[1],2.)+pow(difference[2],2.))/pow(properties.smoothing,2.))/pow(properties.smoothing,5.), 0.359174*difference[1]*exp((pow(difference[0],2.)+pow(difference[1],2.)+pow(difference[2],2.))/pow(properties.smoothing,2.))/pow(properties.smoothing,5.), 0.359174*difference[2]*exp((pow(difference[0],2.)+pow(difference[1],2.)+pow(difference[2],2.))/pow(properties.smoothing,2.))/pow(properties.smoothing,5.));
+  //vec3 grad(0.359174*difference[0]*exp((pow(difference[0],2.)+pow(difference[1],2.)+pow(difference[2],2.))/pow(properties.smoothing,2.))/pow(properties.smoothing,5.), 0.359174*difference[1]*exp((pow(difference[0],2.)+pow(difference[1],2.)+pow(difference[2],2.))/pow(properties.smoothing,2.))/pow(properties.smoothing,5.), 0.359174*difference[2]*exp((pow(difference[0],2.)+pow(difference[1],2.)+pow(difference[2],2.))/pow(properties.smoothing,2.))/pow(properties.smoothing,5.));
+  //use non-exponential kernal:
+  vec3 grad(14.32394488*difference[0]*pow(properties.smoothing-difference.length,2.)/(pow(properties.smoothing,6.)*difference.length),14.32394488*difference[1]*pow(properties.smoothing-difference.length,2.)/(pow(properties.smoothing,6.)*difference.length),14.32394488*difference[2]*pow(properties.smoothing-difference.length,2.)/(pow(properties.smoothing,6.)*difference.length));
   return grad;
   //return -30/PI*pow(properties.smoothing,6.)*pow(properties.smoothing-difference.length(),2.)*difference.normalize();
 }
