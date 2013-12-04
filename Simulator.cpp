@@ -41,8 +41,26 @@ void Simulator::initialize() {
   }
 }
 
-vector<Particle*> Simulator::getNeighborsForParticle(unsigned int i) {
-  vector<Particle*> finalVector = vector<Particle*>();
+float Simulator::calculateParticleDensity(int i, vector<int>* neighbors){
+  float sum = 0;
+  for(int j = 0; j < neighbors->size(); j++) {
+    sum += allParticles[(*neighbors)[j]].fp->mass*kernelFunction(allParticles[i].position - allParticles[(*neighbors)[j]].position);
+  }
+  return sum;
+}
+
+void Simulator::calculateParticleForces(int i, vector<int>* neighbors)  {
+  vec3 pressureForce = vec3();
+  //comment out for now, just to test rendering
+  for(int j = 0; j < neighbors->size(); j++) {
+    pressureForce += (allParticles[i].pressure + allParticles[(*neighbors)[j]].pressure)/2. * allParticles[(*neighbors)[j]].fp->mass/allParticles[(*neighbors)[j]].density * pressureGradient(allParticles[i].position - allParticles[(*neighbors)[j]].position);
+  }
+  vec3 force = gravity*allParticles[i].density-pressureForce;// + viscosityForce + gravity*density;
+  allParticles[i].acceleration = force/allParticles[i].density;
+}
+
+vector<int> Simulator::getNeighborsForParticle(unsigned int i) {
+  vector<int> finalVector = vector<int>();
   Particle p = allParticles[i];
 #ifdef USE_ACCELERATION_STRUCTURES
   //using 3x3 array for now
@@ -50,7 +68,7 @@ vector<Particle*> Simulator::getNeighborsForParticle(unsigned int i) {
     for(int y = max(p.gridPosition.y -1,0); y <= min(p.gridPosition.y + 1,numGridCells); y++) {
       for(int z = max(p.gridPosition.z-1,0); z <= min(p.gridPosition.z + 1,numGridCells); z++) {
         for(std::list<unsigned int>::const_iterator iterator = particleGrid[x][y][z].begin(), end = particleGrid[x][y][z].end(); iterator != end; ++iterator) {
-          finalVector.push_back(&allParticles[*iterator]);
+          finalVector.push_back(*iterator);
         }
       }
     }
@@ -60,7 +78,7 @@ vector<Particle*> Simulator::getNeighborsForParticle(unsigned int i) {
   for(int j = 0; j < allParticles.size(); j ++) {
 
     if((allParticles[j].position-p.position).length() < cutoff) {
-      finalVector.push_back(&(allParticles[j]));
+      finalVector.push_back(j);
     }
   }
 #endif
@@ -72,14 +90,18 @@ vector<Particle*> Simulator::getNeighborsForParticle(unsigned int i) {
 void Simulator::advanceTimeStep() {
   //float GAS_CONST = 8.3145;
   //float GAS_CONST = pow(1.3806, -23);
+  vector<vector<int>> neighbors = vector<vector<int>>();
   for(int i = 0; i < allParticles.size(); i++) { //first loop to calculate pressure values for all particles
-    allParticles[i].density = allParticles[i].calculateDensity(getNeighborsForParticle(i));
+    
+    neighbors.push_back(getNeighborsForParticle(i));
+    allParticles[i].density = calculateParticleDensity(i, &neighbors[i]);
 //    printf("density: %f \n", allParticles[i].density);
 
     allParticles[i].pressure = allParticles[i].fp->pressureConstant * (pow(allParticles[i].density / allParticles[i].fp->restDensity, 7) - 1);
   }
+  
   for(int i = 0; i < allParticles.size(); i++) { //second loop to calculate new accelerations and forces
-    allParticles[i].calculateForces(getNeighborsForParticle(i));
+    calculateParticleForces(i,&neighbors[i]);
   }
   vector<int> toDelete = vector<int>();
   //now actually move the particles
@@ -92,7 +114,7 @@ void Simulator::advanceTimeStep() {
       //if no intersection, just move it normally
       allParticles[i].advanceTimeStep(properties.timestep,numGridCells);
     }
-
+    
     
     //delete any that went offscreen
 #ifdef USE_ACCELERATION_STRUCTURES
@@ -136,10 +158,6 @@ bool Simulator::checkObjectIntersection(int i) {
     Ray r = Ray(allParticles[i].position,allParticles[i].velocity,0,properties.timestep);
     Intersection *in = (Intersection*) malloc(sizeof(Intersection));;
     if(objects[j]->intersectsRay(r, in)) {
-      vec4 newDir = getReflectedRay(r, in).direction;
-      newDir.normalize();
-      newDir *= allParticles[i].fp->elasticity * allParticles[i].velocity.length() * ((properties.timestep-in->t_value) / properties.timestep);
-      allParticles[i].velocity = newDir;
       return true;
     }
   }
@@ -189,7 +207,7 @@ float Simulator::kernelFunction(vec3 difference) {
 
   //using cubic kernal:
   //return 315/(64*PI*pow(properties.smoothing,9.))*pow(pow(properties.smoothing,2.)-pow(difference.length,2.),3.)
-  return 1.56668147/pow(properties.smoothing,9.)*pow(pow(properties.smoothing,2.)-pow(difference.length(),2.),3.)
+  return 1.56668147/pow(properties.smoothing,9.)*pow(pow(properties.smoothing,2.)-pow(difference.length(),2.),3.);
 }
 
 vec3 Simulator::pressureGradient(vec3 difference) {

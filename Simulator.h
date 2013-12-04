@@ -65,7 +65,9 @@ class Simulator {
 
 
   private:
-    vector<Particle*> getNeighborsForParticle(unsigned int i); //return a list of indices
+    vector<int> getNeighborsForParticle(unsigned int i); //return a list of indices
+    float calculateParticleDensity(int i, vector<int>* neighbors);
+    void  calculateParticleForces(int i, vector<int>* neighbors);
     bool checkObjectIntersection(int i);
   
 };

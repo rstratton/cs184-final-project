@@ -22,9 +22,10 @@ int main(int argc, char * argv[])
     printf("not enough arguments \n");
     exit(1);
   }
-  SceneParser p = SceneParser(argv[1]); //parses on construction
-//  int numTimesteps = atoi(argv[2]);
-  Simulator s1 = Simulator(p.properties, p.objects, p.volumes);
+  SceneParser *p = new SceneParser(argv[1]); //parses on construction
+  int numTimesteps = atoi(argv[2]);
+  Simulator s1 = Simulator(p->properties, p->objects, p->volumes);
+  delete p;
   s1.initialize();
 //  s1.addParticle(vec3(200,51,50), FluidProperties(1, 1, 1, 1, 1, Color(1,0,0,0)));
 //  s1.addParticle(vec3(201,50,50), FluidProperties(1, 1, 1, 1, 1, Color(1,0,0,0)));
@@ -36,10 +37,10 @@ int main(int argc, char * argv[])
   ParticleInspector pi(&s1);
   pi.run(argc, argv);
   
-//
+
 //  for(int i = 0; i < numTimesteps; i++) {
 //    s1.advanceTimeStep();
-//    s1.printParticleGrid();
+////    s1.printParticleGrid();
 //    //now something like:
 //    //reconstructor.reconstructSurface()
 //    //renderer.renderSurface()
