@@ -27,12 +27,12 @@ int main(int argc, char * argv[])
   Simulator s1 = Simulator(p->properties, p->objects, p->volumes);
   delete p;
   s1.initialize();
-//  s1.addParticle(vec3(200,51,50), FluidProperties(1, 1, 1, 1, 1, Color(1,0,0,0)));
-//  s1.addParticle(vec3(201,50,50), FluidProperties(1, 1, 1, 1, 1, Color(1,0,0,0)));
-//  s1.addParticle(vec3(200,50,50), FluidProperties(1, 1, 1, 1, 1, Color(1,0,0,0)));
-//  s1.addParticle(vec3(200,49,50), FluidProperties(1, 1, 1, 1, 1, Color(1,0,0,0)));
-//
-//  s1.addParticle(vec3(199,50,50), FluidProperties(1, 1, 1, 1, 1, Color(1,0,0,0)));
+  FluidProperties * fp = new FluidProperties(1, 1, 1, 1, .13, Color(1,0,0,0));
+  s1.addParticle(vec3(200,51,50), fp);
+  s1.addParticle(vec3(201,50,50), fp);
+  s1.addParticle(vec3(200,50,50), fp);
+  s1.addParticle(vec3(200,49,50), fp);
+  s1.addParticle(vec3(199,50,50), fp);
 
   ParticleInspector pi(&s1);
   pi.run(argc, argv);

@@ -50,12 +50,16 @@ float Simulator::calculateParticleDensity(int i, vector<int>* neighbors){
 }
 
 void Simulator::calculateParticleForces(int i, vector<int>* neighbors)  {
-  vec3 pressureForce = vec3();
+  vec3 pressureForce = vec3(0);
   //comment out for now, just to test rendering
-  for(int j = 0; j < neighbors->size(); j++) {
-    pressureForce += (allParticles[i].pressure + allParticles[(*neighbors)[j]].pressure)/2. * allParticles[(*neighbors)[j]].fp->mass/allParticles[(*neighbors)[j]].density * pressureGradient(allParticles[i].position - allParticles[(*neighbors)[j]].position);
+  if(allParticles[i].density > allParticles[i].fp->restDensity)
+  {
+    for(int j = 0; j < neighbors->size(); j++) {
+      pressureForce += (allParticles[i].pressure + allParticles[(*neighbors)[j]].pressure)/2. * allParticles[(*neighbors)[j]].fp->mass/allParticles[(*neighbors)[j]].density * pressureGradient(allParticles[i].position - allParticles[(*neighbors)[j]].position);
+    }
   }
-  vec3 force = gravity*allParticles[i].density-pressureForce;// + viscosityForce + gravity*density;
+  
+  vec3 force = -pressureForce;// + viscosityForce + gravity*density;
   allParticles[i].acceleration = force/allParticles[i].density;
 }
 
@@ -77,7 +81,7 @@ vector<int> Simulator::getNeighborsForParticle(unsigned int i) {
   //naive, just iterate and check the distance
   for(int j = 0; j < allParticles.size(); j ++) {
 
-    if((allParticles[j].position-p.position).length() < cutoff) {
+    if((allParticles[j].position-p.position).length() < cutoff && i != j) {
       finalVector.push_back(j);
     }
   }
@@ -90,7 +94,7 @@ vector<int> Simulator::getNeighborsForParticle(unsigned int i) {
 void Simulator::advanceTimeStep() {
   //float GAS_CONST = 8.3145;
   //float GAS_CONST = pow(1.3806, -23);
-  vector<vector<int>> neighbors = vector<vector<int>>();
+  vector< vector<int> > neighbors = vector< vector<int> >();
   for(int i = 0; i < allParticles.size(); i++) { //first loop to calculate pressure values for all particles
     
     neighbors.push_back(getNeighborsForParticle(i));
@@ -216,7 +220,7 @@ vec3 Simulator::pressureGradient(vec3 difference) {
   }
   //vec3 grad(0.359174*difference[0]*exp((pow(difference[0],2.)+pow(difference[1],2.)+pow(difference[2],2.))/pow(properties.smoothing,2.))/pow(properties.smoothing,5.), 0.359174*difference[1]*exp((pow(difference[0],2.)+pow(difference[1],2.)+pow(difference[2],2.))/pow(properties.smoothing,2.))/pow(properties.smoothing,5.), 0.359174*difference[2]*exp((pow(difference[0],2.)+pow(difference[1],2.)+pow(difference[2],2.))/pow(properties.smoothing,2.))/pow(properties.smoothing,5.));
   //use non-exponential kernal:
-  vec3 grad(14.32394488*difference[0]*pow(properties.smoothing-difference.length(),2.)/(pow(properties.smoothing,6.)*difference.length()),14.32394488*difference[1]*pow(properties.smoothing-difference.length(),2.)/(pow(properties.smoothing,6.)*difference.length()),14.32394488*difference[2]*pow(properties.smoothing-difference.length(),2.)/(pow(properties.smoothing,6.)*difference.length()));
+  vec3 grad(-14.32394488*difference[0]*pow(properties.smoothing-difference.length(),2.)/(pow(properties.smoothing,6.)*difference.length()),-14.32394488*difference[1]*pow(properties.smoothing-difference.length(),2.)/(pow(properties.smoothing,6.)*difference.length()),-14.32394488*difference[2]*pow(properties.smoothing-difference.length(),2.)/(pow(properties.smoothing,6.)*difference.length()));
   return grad;
   //return -30/PI*pow(properties.smoothing,6.)*pow(properties.smoothing-difference.length(),2.)*difference.normalize();
 }
