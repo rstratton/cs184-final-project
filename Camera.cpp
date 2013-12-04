@@ -20,15 +20,17 @@ vec3 Camera::location() {
     float hAngleRads = hAngle * (PI / 180);
     float vAngleRads = vAngle * (PI / 180);
     // Apply vertical angle movement (rotation about z-axis)
-    location[VY] = radius * cos(vAngleRads);
-    location[VZ] = radius * sin(vAngleRads);
+    //location[VY] = radius * cos(vAngleRads);
+    //location[VZ] = radius * sin(vAngleRads);
+    location[VZ] = radius * cos(vAngleRads);
+    location[VY] = radius * sin(vAngleRads);
     // Apply horizontal angle movement (rotation about y-axis)
     float old_x = location[VX];
-    float old_y = location[VY];
+    float old_z = location[VZ];
     float cos_term = cos(hAngleRads);
     float sin_term = sin(hAngleRads);
-    location[VX] = cos_term * old_x + sin_term * old_y;
-    location[VY] = -sin_term * old_x + cos_term * old_y;
+    location[VX] = cos_term * old_x + sin_term * old_z;
+    location[VZ] = -sin_term * old_x + cos_term * old_z;
     return location;
 }
 
@@ -54,7 +56,7 @@ void Camera::update() {
     vec3 eye_loc = location();
     gluLookAt(eye_loc[VX], eye_loc[VY], eye_loc[VZ],
               0, 0, 0,
-              0, 0, 1);
+              0, 1, 0);
 }
 
 vec3 Camera::forward() {
@@ -63,14 +65,14 @@ vec3 Camera::forward() {
 
 vec3 Camera::up() {
     vec3 forward = this->forward();
-    vec3 yAxis(0, 0, 1);
+    vec3 yAxis(0, 1, 0);
     vec3 right = forward ^ yAxis;
     return (right ^ forward).normalize();
 }
 
 vec3 Camera::right() {
     vec3 forward = this->forward();
-    vec3 yAxis(0, 0, 1);
+    vec3 yAxis(0, 1, 0);
     return (forward ^ yAxis).normalize();
 }
 
