@@ -15,7 +15,7 @@ else
 	LDFLAGS = -lglut -lGLU
 endif
 
-all: main particle_inspector
+all: main
 
 main: $(OBJ_FILES) main.cpp
 	$(CC) $(CFLAGS) main.cpp $(OBJ_FILES) -o main.exe $(LDFLAGS)
