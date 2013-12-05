@@ -38,6 +38,7 @@ class Simulator {
     //the objects the fluid will interact with
     vector <StaticObject*> objects;
     vec3 numGridCells;    //calculated at initialization
+    vector<Particle> allParticles;
     void initialize();
     void addParticle(vec3 pos, FluidProperties* fp);
     void advanceTimeStep();
@@ -53,16 +54,15 @@ class Simulator {
       objects.clear();
     }
     vector<int> getNeighborsForPosition(vec3 position);
+    float kernelFunction(vec3 difference); //simple gaussian for now
 
 
   protected:
     friend struct Particle; //so particle can use these methods
     friend class Renderer;
     friend class ParticleInspector;
-    float kernelFunction(vec3 difference); //simple gaussian for now
     vec3 pressureGradient(vec3 difference);
     float viscosity(vec3 difference);
-    vector<Particle> allParticles;
 
 
   private:
