@@ -7,7 +7,7 @@ using namespace std;
 // How many samples from the scalar field will be taken per grid cell width
 // (grid cells being the cells of the acceleration structure).  Grid cell width
 // is equivalent to sim->cutoff
-const int samplesPerGridCellWidth = 1;
+const int samplesPerGridCellWidth = 5;
 
 Surface::Surface(Simulator* s) {
     sim = s;
@@ -27,7 +27,7 @@ Surface::Surface(Simulator* s) {
                 latticePoints[i][j][k].position = vec3(i * latticePointSpacing,
                                                        j * latticePointSpacing,
                                                        k * latticePointSpacing);
-                latticePoints[i][j][k].inclusion = positionIsInSurface(latticePoints[i][j][k].position);
+                latticePoints[i][j][k].included = positionIsInSurface(latticePoints[i][j][k].position);
             }
         }
     }
@@ -46,7 +46,7 @@ void Surface::resample() {
     for (int i = 0; i < xSamples; ++i) {
         for (int j = 0; j < ySamples; ++j) {
             for (int k = 0; k < zSamples; ++k) {
-                latticePoints[i][j][k].inclusion = positionIsInSurface(latticePoints[i][j][k].position);
+                latticePoints[i][j][k].included = positionIsInSurface(latticePoints[i][j][k].position);
             }
         }
     }
@@ -57,7 +57,7 @@ bool Surface::positionIsInSurface(vec3 position) {
     float sum = 0;
     for(int j = 0; j < neighbors.size(); j++) {
         Particle neighbor = sim->allParticles[neighbors[j]];
-        sum += (neighbor.fp->mass / neighbor.density) * sim->kernelFunction(position - neighbor.position);
+        sum += (neighbor.fp->mass / neighbor.density ) * sim->kernelFunction(position - neighbor.position);
     }
     return sum > 0.5;
 }

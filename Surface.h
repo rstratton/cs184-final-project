@@ -5,10 +5,10 @@
 #include "Simulator.h"
 
 struct LatticePoint {
-    LatticePoint() : position(), inclusion(false) {};
-    LatticePoint(vec3 loc, bool inc) : position(loc), inclusion(inc) {};
+    LatticePoint() : position(), included(false) {};
+    LatticePoint(vec3 loc, bool inc) : position(loc), included(inc) {};
     vec3 position;
-    bool inclusion;
+    bool included;
 };
 
 class Surface {
