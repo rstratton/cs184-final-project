@@ -16,28 +16,48 @@ Surface::Surface(Simulator* s) {
     ySamples = ceil(sim->properties.worldSize[1] / latticePointSpacing);
     zSamples = ceil(sim->properties.worldSize[2] / latticePointSpacing);
 
-    // Initialize lattice points 3D array
+    // Initialize lattice points 3D array with position and inclusion fields
+    // for each LatticePoint
     latticePoints = new LatticePoint**[xSamples];
     for (int i = 0; i < xSamples; ++i) {
         latticePoints[i] = new LatticePoint*[ySamples];
         for (int j = 0; j < ySamples; ++j) {
             latticePoints[i][j] = new LatticePoint[zSamples];
             for (int k = 0; k < zSamples; ++k) {
-                vec3 location(i * latticePointSpacing,
-                              j * latticePointSpacing,
-                              k * latticePointSpacing);
-                // TODO: Sample field here and assign inclusion values
-                // Does this necessitate constructing a particle to get
-                // neighbors?
+                latticePoints[i][j][k].position = vec3(i * latticePointSpacing,
+                                                       j * latticePointSpacing,
+                                                       k * latticePointSpacing);
+                latticePoints[i][j][k].inclusion = positionIsInSurface(latticePoints[i][j][k].position);
             }
         }
     }
 }
 
-//float Simulator::calculateParticleDensity(int i, vector<int>* neighbors){
-//  float sum = 0;
-//  for(int j = 0; j < neighbors->size(); j++) {
-//    sum += allParticles[(*neighbors)[j]].fp->mass*kernelFunction(allParticles[i].position - allParticles[(*neighbors)[j]].position);
-//  }
-//  return sum;
-//}
+Surface::~Surface() {
+    for (int i = 0; i < xSamples; ++i) {
+        for (int j = 0; j < ySamples; ++j) {
+            delete latticePoints[i][j];
+        }
+        delete latticePoints[i];
+    }
+}
+
+void Surface::resample() {
+    for (int i = 0; i < xSamples; ++i) {
+        for (int j = 0; j < ySamples; ++j) {
+            for (int k = 0; k < zSamples; ++k) {
+                latticePoints[i][j][k].inclusion = positionIsInSurface(latticePoints[i][j][k].position);
+            }
+        }
+    }
+}
+
+bool Surface::positionIsInSurface(vec3 position) {
+    vector<int> neighbors = sim->getNeighborsForPosition(position);
+    float sum = 0;
+    for(int j = 0; j < neighbors.size(); j++) {
+        Particle neighbor = sim->allParticles[neighbors[j]];
+        sum += (neighbor.fp->mass / neighbor.density) * sim->kernelFunction(position - neighbor.position);
+    }
+    return sum > 0.5;
+}

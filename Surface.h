@@ -5,9 +5,9 @@
 #include "Simulator.h"
 
 struct LatticePoint {
-    LatticePoint() : location(), inclusion(false) {};
-    LatticePoint(vec3 loc, bool inc) : location(loc), inclusion(inc) {};
-    vec3 location;
+    LatticePoint() : position(), inclusion(false) {};
+    LatticePoint(vec3 loc, bool inc) : position(loc), inclusion(inc) {};
+    vec3 position;
     bool inclusion;
 };
 
@@ -21,6 +21,9 @@ class Surface {
         int xSamples, ySamples, zSamples;
 
         Surface(Simulator* s);
+        ~Surface();
+        void resample();
+        bool positionIsInSurface(vec3 position);
 };
 
 #endif
