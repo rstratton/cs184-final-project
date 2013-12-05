@@ -52,6 +52,7 @@ class Simulator {
       }
       objects.clear();
     }
+    vector<int> getNeighborsForPosition(vec3 position);
 
 
   protected:

@@ -93,6 +93,34 @@ vector<int> Simulator::getNeighborsForParticle(unsigned int i) {
   return finalVector;
 }
 
+vector<int> Simulator::getNeighborsForPosition(vec3 position) {
+    GridPosition gridPosition;
+    gridPosition.x = floor((position[0]/properties.worldSize[0])*numGridCells[0]);
+    gridPosition.y = floor((position[1]/properties.worldSize[1])*numGridCells[1]);
+    gridPosition.z = floor((position[2]/properties.worldSize[2])*numGridCells[2]);
+    vector<int> finalVector = vector<int>();
+#ifdef USE_ACCELERATION_STRUCTURES
+    for(int x = max(gridPosition.x -1,0); x <= fmin(gridPosition.x + 1.,numGridCells[0]-1); x++) {
+        for(int y = max(gridPosition.y -1,0); y <= fmin(gridPosition.y + 1.,numGridCells[1]-1); y++) {
+            for(int z = max(gridPosition.z-1,0); z <= fmin(gridPosition.z + 1.,numGridCells[2]-1); z++) {
+                for(std::list<unsigned int>::const_iterator iterator = particleGrid[x][y][z].begin(), end = particleGrid[x][y][z].end(); iterator != end; ++iterator) {
+                    if((position - allParticles[*iterator].position).length() < cutoff) {
+                        finalVector.push_back(*iterator);
+                    }
+                }
+            }
+        }
+    }
+#else
+    for(int j = 0; j < allParticles.size(); j ++) {
+        if((allParticles[j].position-position).length() < cutoff) {
+            finalVector.push_back(j);
+        }
+    }
+#endif
+    return finalVector;
+}
+
 
 void Simulator::advanceTimeStep() {
   //float GAS_CONST = 8.3145;
