@@ -1,4 +1,4 @@
-size 20 60 20
+size 20 70 20
 
 timestep .001
 
@@ -12,6 +12,12 @@ smoothing 3
 object tub.obj 5 5 5
 
 #fluid 	name 	mass 	viscosity 	pressureConstant 	elasticity 	restDensity 	r g b a
-fluid 	water 	1 		1 			1 					.6 			1				.2 	.2 	.8 	.7 
+fluid 	water 	1 		1         10                 .6          1            .2 	.2 	.8 	.7
 
 volume water rect 7.5 7.5 7.5 5 20 5
+
+#some measurements for speed
+#For 5 x 20 x 5 column. 5000 iterations: 86 sec
+#For 5 x 40 x 5 column, 5000 iterations: 205 sec
+#with parallelism:
+#For 5 x 20 x 5 column. 5000 iterations: 55 sec

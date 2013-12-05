@@ -46,7 +46,8 @@ FluidVolume::FluidVolume(FluidProperties fp, string v, vector<string> args) : vo
     for(int x = 0; x < size[0]; x += 1) {
       for(int y = 0; y < size[1]; y += 1) {
         for(int z = 0; z < size[2]; z += 1) {
-          points.push_back(vec3(origin[0]+x,origin[1]+y,origin[2]+z));
+          float jitter = (rand() % 10 - 5) / 10.;
+          points.push_back(vec3(origin[0]+x + jitter,origin[1]+y + jitter,origin[2]+z + jitter));
         }
       }
     }

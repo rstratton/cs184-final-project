@@ -3,10 +3,11 @@ RM = /bin/rm -rf
 OBJ_FILES = algebra3.o Fluid.o Particle.o SceneParser.o Simulator.o StaticObject.o Camera.o KeyboardHandlers.o Renderer.o ParticleInspector.o BVH.o Shape.o
 
 ifeq ($(shell sw_vers 2>/dev/null | grep Mac | awk '{ print $$2}'),Mac)
-    CFLAGS = -g -DGL_GLEXT_PROTOTYPES -I./include/ -I/usr/X11/include -DOSX
+    CFLAGS = -g -DGL_GLEXT_PROTOTYPES -I./include/ -I/usr/X11/include -I./ -DOSX
     LDFLAGS = -framework GLUT -framework OpenGL \
     	-L"/System/Library/Frameworks/OpenGL.framework/Libraries" \
-    	-lGL -lGLU -lm -lstdc++
+		-L"./" \
+    	-lGL -lGLU -lm -lstdc++ -ltbb
 else
 	#CFLAGS = -g -DGL_GLEXT_PROTOTYPES -Iglut-3.7.6-bin
 	#LDFLAGS = -lglut -lGLU -lGL

@@ -9,6 +9,7 @@
 #include "Simulator.h"
 #define USE_ACCELERATION_STRUCTURES
 #include "Shape.h"
+#include <thread>
 using namespace std;
 
 void Simulator::initialize() {
@@ -19,7 +20,12 @@ void Simulator::initialize() {
   cutoff = properties.smoothing;
   numGridCells = vec3(ceil(properties.worldSize[0] / cutoff),ceil(properties.worldSize[1] / cutoff),ceil(properties.worldSize[2] / cutoff));
   kernelCoeff = 1.56668147/pow(properties.smoothing,9.);
-  
+#if (defined(OSX) || defined(__APPLE__)) && defined(PARALLEL)
+  tbb::task_scheduler_init init(std::thread::hardware_concurrency());
+  printf("concurrency: %d \n", std::thread::hardware_concurrency());
+  densityExec =  new TbbDensityExecutor((Simulator*)this);
+  forceExec =  new TbbForceExecutor((Simulator*)this);
+#endif
   
   //initialize the grid
 #ifdef USE_ACCELERATION_STRUCTURES
@@ -33,7 +39,6 @@ void Simulator::initialize() {
       }
     }
   }
-  nextParticleGrid = particleGrid;
 #endif
   
   //set up the fluid at the initial state
@@ -93,59 +98,79 @@ vector<int> Simulator::getNeighborsForParticle(unsigned int i) {
   return finalVector;
 }
 
+void Simulator::moveParticleCalculation(int i) {
+#ifdef USE_ACCELERATION_STRUCTURES
+  particleGrid[allParticles[i].gridPosition.x][allParticles[i].gridPosition.y][allParticles[i].gridPosition.z].remove(i);
+#endif
+  //check for object intersections
+  if(!checkObjectIntersection(i)) {
+    //if no intersection, just move it normally
+    allParticles[i].advanceTimeStep(properties.timestep,numGridCells);
+  }
+  
+  
+  //delete any that went offscreen
+#ifdef USE_ACCELERATION_STRUCTURES
+  if(allParticles[i].gridPosition.x >= 0 && allParticles[i].gridPosition.y >= 0
+     && allParticles[i].gridPosition.z >= 0 && allParticles[i].gridPosition.x < numGridCells[0]
+     && allParticles[i].gridPosition.y < numGridCells[1] && allParticles[i].gridPosition.z < numGridCells[2])
+  {
+    particleGrid[allParticles[i].gridPosition.x][allParticles[i].gridPosition.y][allParticles[i].gridPosition.z].push_back(i);
+  } else {
+    toDelete.push_back(i);
+  }
+#else
+  if (!(allParticles[i].position[0] >= 0 && allParticles[i].position[1] >= 0
+        && allParticles[i].position[2] >= 0 && allParticles[i].position[0] < properties.worldSize[0]
+        && allParticles[i].position[1] < properties.worldSize[1] && allParticles[i].position[2] < properties.worldSize[2])) {
+    toDelete.push_back(i);
+  }
+  
+#endif
+
+}
+
+void Simulator::densityCalculation(int i) {
+  vector<int> neighbors = getNeighborsForParticle(i);
+  allParticles[i].density = calculateParticleDensity(i, &neighbors);
+  //    printf("density: %f \n", allParticles[i].density);
+  
+  allParticles[i].pressure = allParticles[i].fp->pressureConstant * (pow(allParticles[i].density / allParticles[i].fp->restDensity, 7) - 1);
+}
+
+void Simulator::forceCalculation(int i) {
+  vector<int> neighbors = getNeighborsForParticle(i);
+  calculateParticleForces(i,&neighbors);
+}
 
 void Simulator::advanceTimeStep() {
   //float GAS_CONST = 8.3145;
   //float GAS_CONST = pow(1.3806, -23);
-  vector< vector<int> > neighbors = vector< vector<int> >();
-  for(int i = 0; i < allParticles.size(); i++) { //first loop to calculate pressure values for all particles
-    
-    neighbors.push_back(getNeighborsForParticle(i));
-    allParticles[i].density = calculateParticleDensity(i, &neighbors[i]);
-//    printf("density: %f \n", allParticles[i].density);
-
-    allParticles[i].pressure = allParticles[i].fp->pressureConstant * (pow(allParticles[i].density / allParticles[i].fp->restDensity, 7) - 1);
-  }
-  
-  for(int i = 0; i < allParticles.size(); i++) { //second loop to calculate new accelerations and forces
-    calculateParticleForces(i,&neighbors[i]);
-  }
-  vector<int> toDelete = vector<int>();
-  //now actually move the particles
-  for(int i = 0; i< allParticles.size(); i++) {
-#ifdef USE_ACCELERATION_STRUCTURES
-    particleGrid[allParticles[i].gridPosition.x][allParticles[i].gridPosition.y][allParticles[i].gridPosition.z].remove(i);
-#endif
-    //check for object intersections
-    if(!checkObjectIntersection(i)) {
-      //if no intersection, just move it normally
-      allParticles[i].advanceTimeStep(properties.timestep,numGridCells);
-    }
-    
-    
-    //delete any that went offscreen
-#ifdef USE_ACCELERATION_STRUCTURES
-    if(allParticles[i].gridPosition.x >= 0 && allParticles[i].gridPosition.y >= 0
-       && allParticles[i].gridPosition.z >= 0 && allParticles[i].gridPosition.x < numGridCells[0]
-       && allParticles[i].gridPosition.y < numGridCells[1] && allParticles[i].gridPosition.z < numGridCells[2])
-    {
-      particleGrid[allParticles[i].gridPosition.x][allParticles[i].gridPosition.y][allParticles[i].gridPosition.z].push_back(i);
-    } else {
-      toDelete.push_back(i);
-    }
+#if (defined(OSX) || defined(__APPLE__)) && defined(PARALLEL)
+  parallel_for( tbb::blocked_range<int>( 0, (int)allParticles.size()), *densityExec);
 #else
-    if (!(allParticles[i].position[0] >= 0 && allParticles[i].position[1] >= 0
-       && allParticles[i].position[2] >= 0 && allParticles[i].position[0] < properties.worldSize[0]
-       && allParticles[i].position[1] < properties.worldSize[1] && allParticles[i].position[2] < properties.worldSize[2])) {
-      toDelete.push_back(i);
-    }
-      
+  for(int i = 0; i < allParticles.size(); i++) { //first loop to calculate pressure values for all particles
+    densityCalculation(i);
+  }
 #endif
+#if (defined(OSX) || defined(__APPLE__)) && defined(PARALLEL)
+  parallel_for( tbb::blocked_range<int>( 0, (int)allParticles.size()), *forceExec);
+#else
+  for(int i = 0; i < allParticles.size(); i++) { //second loop to calculate new accelerations and forces
+    vector<int> neighbors = getNeighborsForParticle(i);
+    calculateParticleForces(i,&neighbors)
+  }
+#endif
+  toDelete = vector<int>();
+  //now actually move the particles
+  for(int i = 0; i < allParticles.size(); i++) {
+    moveParticleCalculation(i); //not easy to parallelize because of data structure...worth it?
   }
   //now delete the particles that went offscreen
   for(int i = 0; i < toDelete.size(); i++) {
     allParticles.erase(allParticles.begin()+ (toDelete[i] - i)); //-i to deal with the offset of erasing the previous ones
   }
+  toDelete.clear();
   
 }
 

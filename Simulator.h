@@ -18,6 +18,11 @@
 #include <utility>
 #include "SceneParser.h"
 #include "Fluid.h"
+#define PARALLEL
+
+#if (defined(OSX) || defined(__APPLE__)) && defined(PARALLEL)
+  #include "tbb/tbb.h"
+#endif
 #define PI 3.14159
 
 using namespace std;
@@ -29,7 +34,6 @@ class Simulator {
 
   //talked to the professor, seems like a list of int indices is the best method.
   vector<vector<vector<list<unsigned int> > > > particleGrid;
-  vector<vector<vector<list<unsigned int> > > > nextParticleGrid;
   vector<FluidVolume> volumes; //the initial volumes the fluids have. Really only needed for initialization
 
   
@@ -51,6 +55,10 @@ class Simulator {
         delete objects[i];
       }
       objects.clear();
+#if (defined(OSX) || defined(__APPLE__)) && defined(PARALLEL)
+      delete forceExec;
+      delete densityExec;
+#endif
     }
 
 
@@ -66,10 +74,46 @@ class Simulator {
 
   private:
     vector<int> getNeighborsForParticle(unsigned int i); //return a list of indices
+    vector<vector <int> > neighborTable;
     float calculateParticleDensity(int i, vector<int>* neighbors);
     void  calculateParticleForces(int i, vector<int>* neighbors);
     bool checkObjectIntersection(int i);
-  float kernelCoeff;
+    float kernelCoeff;
+    void densityCalculation(int i) ;
+    void forceCalculation(int i) ;
+    void moveParticleCalculation(int i) ;
+
+    vector<int> toDelete;
+
+    //tbb stuff
+#if (defined(OSX) || defined(__APPLE__)) && defined(PARALLEL)
+    class TbbDensityExecutor {
+      public:
+        TbbDensityExecutor(Simulator* s) : sim(s) {}
+        void operator() (tbb::blocked_range<int> r) const {
+          for (size_t i = r.begin(); i!=r.end(); ++i) {
+            sim->densityCalculation((int)i);
+          }
+        }
+        
+      private:
+        Simulator* sim;
+    };
+    class TbbForceExecutor {
+      public:
+        TbbForceExecutor(Simulator* s) : sim(s) {}
+        void operator() (tbb::blocked_range<int> r) const {
+          for (size_t i = r.begin(); i!=r.end(); ++i) {
+            sim->forceCalculation((int)i);
+          }
+        }
+        
+      private:
+        Simulator* sim;
+    };
+  TbbDensityExecutor* densityExec;
+  TbbForceExecutor* forceExec;
+#endif
   
 };
 
