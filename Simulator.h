@@ -24,8 +24,7 @@ using namespace std;
 
 
 class Simulator {
-  
-  int cutoff;
+
 
   //talked to the professor, seems like a list of int indices is the best method.
   vector<vector<vector<list<unsigned int> > > > particleGrid;
@@ -34,6 +33,7 @@ class Simulator {
 
   
   public:
+    int cutoff;
     SceneProperties properties;
     //the objects the fluid will interact with
     vector <StaticObject*> objects;
