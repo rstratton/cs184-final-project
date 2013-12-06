@@ -84,6 +84,14 @@ void Renderer::render() {
     surface.resample();
     glColor3f(1, 0, 0);
     drawLatticePoints(surface);
+
+    vector<MeshTriangle>* triangles = surface.getMesh();
+    glColor3f(1, 1, 0);
+    glBegin(GL_LINES);
+    for (int i = 0; i < triangles->size(); ++i) {
+        (*triangles)[i].drawOutline();
+    }
+    glEnd();
   
     glColor3f(0, 0, 1);
     for(int i =0; i < simulator->objects.size(); i++) {
