@@ -1,0 +1,18 @@
+size 50 80 50
+
+timestep .001
+
+smoothing 3
+
+#fluid keyword defines a fluid with the given properties and associates it with the given name
+#format is 
+#fluid 	name 	mass 	viscosity 	pressureConstant 	elasticity 	restDensity 	r g b a
+fluid 	water 	1 		1         10                 .25         1            .2 	.2 	.8 	.7
+
+volume water rect 10 70 10 10 10 10
+
+#object keyword then filename (obj file defining faces) then x y z
+object tiltedPlane1.obj 10 50 10
+object tiltedPlane2.obj 30 30 10
+object tiltedPlane1.obj 10 10 10
+object tub.obj 50 0 10
