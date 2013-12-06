@@ -34,8 +34,8 @@ int main(int argc, char * argv[])
 //  s1.addParticle(vec3(200,49,50), fp);
 //  s1.addParticle(vec3(199,50,50), fp);
 ////
-//  ParticleInspector pi(&s1);
-//  pi.run(argc, argv);
+  ParticleInspector pi(&s1);
+  pi.run(argc, argv);
 //
 
   time_t startTime = time(NULL);
