@@ -6,9 +6,11 @@
 #include "algebra3.h"
 #include "Camera.h"
 #include "Particle.h"
+#include "Surface.h"
 class Simulator;
 class Renderer {
     public:
+        Surface surface;
         Simulator* simulator;
         Renderer(Camera* c, vec3* pos, Simulator* sim);
         void render();
