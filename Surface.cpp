@@ -8,7 +8,7 @@ using namespace std;
 // How many samples from the scalar field will be taken per grid cell width
 // (grid cells being the cells of the acceleration structure).  Grid cell width
 // is equivalent to sim->cutoff
-const int samplesPerGridCellWidth = 5;
+const int samplesPerGridCellWidth = 7;
 
 Surface::Surface(Simulator* s) {
     initLookupTable();
@@ -52,6 +52,15 @@ void Surface::resample() {
             }
         }
     }
+    //latticePoints[20][20][20].included = true;
+    //latticePoints[20][19][20].included = true;
+    //latticePoints[21][19][20].included = true;
+    //latticePoints[21][20][20].included = true;
+
+    //latticePoints[20][20][21].included = true;
+    //latticePoints[20][19][21].included = true;
+    //latticePoints[21][19][21].included = true;
+    //latticePoints[21][20][21].included = true;
 }
 
 bool Surface::positionIsInSurface(vec3 position) {
@@ -73,6 +82,7 @@ vector<MeshTriangle>* Surface::getMesh() {
                 // Split this cell (formed by 8 lattice points) into 6 tetrahedra
                 // and append the triangles returned by the marching tetrahedra
                 // algorithm to the triangles vector
+
                 appendTriangles(latticePoints[i][j+1][k],
                                 latticePoints[i][j][k],
                                 latticePoints[i][j][k+1],
@@ -93,7 +103,7 @@ vector<MeshTriangle>* Surface::getMesh() {
 
                 appendTriangles(latticePoints[i][j+1][k],
                                 latticePoints[i][j+1][k+1],
-                                latticePoints[i+1][j+1][k],
+                                latticePoints[i+1][j+1][k+1],
                                 latticePoints[i+1][j][k+1],
                                 false, triangles);
 
