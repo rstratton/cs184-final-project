@@ -75,23 +75,32 @@ void Renderer::render() {
     float z = (*objectOffset)[VZ];
     glTranslatef(x, y, z);
   
-    glColor3f(0, 1, 0);
-    for (int i = 0; i < simulator->allParticles.size(); ++i) {
-        drawParticle(simulator->allParticles[i]);
+    if (properties.showParticles) {
+        glColor3f(0, 1, 0);
+        for (int i = 0; i < simulator->allParticles.size(); ++i) {
+            drawParticle(simulator->allParticles[i]);
+        }
     }
 
-    // Draw lattice points used in surface reconstruction
-    surface.resample();
-    glColor3f(1, 0, 0);
-    drawLatticePoints(surface);
+    //if (properties.showLattice || properties.showMesh) {
+    //    surface.resample();
+    //}
 
-    vector<MeshTriangle>* triangles = surface.getMesh();
-    glColor3f(1, 1, 0);
-    glBegin(GL_LINES);
-    for (int i = 0; i < triangles->size(); ++i) {
-        (*triangles)[i].drawOutline();
+    if (properties.showLattice) {
+        // Draw lattice points used in surface reconstruction
+        glColor3f(1, 0, 0);
+        drawLatticePoints(surface);
     }
-    glEnd();
+
+    if (properties.showMesh) {
+        vector<MeshTriangle>* triangles = surface.getMesh();
+        glColor3f(1, 1, 0);
+        glBegin(GL_LINES);
+        for (int i = 0; i < triangles->size(); ++i) {
+            (*triangles)[i].drawOutline();
+        }
+        glEnd();
+    }
   
     glColor3f(0, 0, 1);
     for(int i =0; i < simulator->objects.size(); i++) {
