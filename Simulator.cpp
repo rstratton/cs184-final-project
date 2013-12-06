@@ -105,10 +105,10 @@ void Simulator::moveParticleCalculation(int i) {
   particleGrid[allParticles[i].gridPosition.x][allParticles[i].gridPosition.y][allParticles[i].gridPosition.z].remove(i);
 #endif
   //check for object intersections
-  if(!checkObjectIntersection(i)) {
-    //if no intersection, just move it normally
+  bool hit = checkObjectIntersection(i);
+  //if no intersection, just move it normally
+  if(!hit)
     allParticles[i].advanceTimeStep(properties.timestep,numGridCells);
-  }
 }
 
 void Simulator::densityCalculation(int i) {
@@ -168,7 +168,7 @@ void Simulator::advanceTimeStep() {
 #else
   for(int i = 0; i < allParticles.size(); i++) { //second loop to calculate new accelerations and forces
     vector<int> neighbors = getNeighborsForParticle(i);
-    calculateParticleForces(i,&neighbors)
+    calculateParticleForces(i,&neighbors);
   }
 #endif
   //empty the particle grid;
@@ -221,11 +221,25 @@ Ray getReflectedRay(Ray r, Intersection* intersect) {
   return Ray(pos,newDir,.001f,300);
 }
 
+vec3 getPlaneProjection(vec3 dir, vec3 normal) {
+  float len = dir.length();
+  dir.normalize();
+  normal.normalize();
+  vec3 projUnit = dir - (dir*normal) * normal;
+  return projUnit*len;
+}
+
 bool Simulator::checkObjectIntersection(int i) {
   for(int j = 0; j < objects.size(); j++) {
     Ray r = Ray(allParticles[i].position,allParticles[i].velocity,0,properties.timestep);
     Intersection *in = (Intersection*) malloc(sizeof(Intersection));;
     if(objects[j]->intersectsRay(r, in)) {
+//      vec3 vel = getPlaneProjection(allParticles[i].velocity, in->localGeo.normal  );
+//      allParticles[i].position += vel;
+//      allParticles[i].velocity = 0;
+//      if(allParticles[i].position[1] < 5) {
+//        printf("wrong dir vel: %f %f %f", vel[0],vel[1],vel[2]);
+//      }
       return true;
     }
   }
