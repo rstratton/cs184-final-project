@@ -52,6 +52,15 @@ void Surface::resample() {
             }
         }
     }
+    //latticePoints[20][20][20].included = true;
+    //latticePoints[20][19][20].included = true;
+    //latticePoints[21][19][20].included = true;
+    //latticePoints[21][20][20].included = true;
+
+    //latticePoints[20][20][21].included = true;
+    //latticePoints[20][19][21].included = true;
+    //latticePoints[21][19][21].included = true;
+    //latticePoints[21][20][21].included = true;
 }
 
 bool Surface::positionIsInSurface(vec3 position) {
@@ -68,11 +77,12 @@ bool Surface::positionIsInSurface(vec3 position) {
 vector<MeshTriangle>* Surface::getMesh() {
     vector<MeshTriangle>* triangles = new vector<MeshTriangle>();
     for (int i = 0; i < xSamples - 1; ++i) {
-        for (int j = 0; j < xSamples - 1; ++j) {
-            for (int k = 0; k < xSamples - 1; ++k) {
+        for (int j = 0; j < ySamples - 1; ++j) {
+            for (int k = 0; k < zSamples - 1; ++k) {
                 // Split this cell (formed by 8 lattice points) into 6 tetrahedra
                 // and append the triangles returned by the marching tetrahedra
                 // algorithm to the triangles vector
+
                 appendTriangles(latticePoints[i][j+1][k],
                                 latticePoints[i][j][k],
                                 latticePoints[i][j][k+1],
@@ -93,7 +103,7 @@ vector<MeshTriangle>* Surface::getMesh() {
 
                 appendTriangles(latticePoints[i][j+1][k],
                                 latticePoints[i][j+1][k+1],
-                                latticePoints[i+1][j+1][k],
+                                latticePoints[i+1][j+1][k+1],
                                 latticePoints[i+1][j][k+1],
                                 false, triangles);
 

@@ -30,6 +30,16 @@ void KeyboardHandlers::basicKeyHandler(unsigned char key, int x, int y) {
             break;
         case 'n':
             renderer->advance(100);
+            renderer->surface.resample();
+            break;
+        case 'a':
+            renderer->properties.showParticles = !renderer->properties.showParticles;
+            break;
+        case 's':
+            renderer->properties.showLattice = !renderer->properties.showLattice;
+            break;
+        case 'd':
+            renderer->properties.showMesh = !renderer->properties.showMesh;
             break;
     }
     // Redraw the scene

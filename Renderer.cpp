@@ -75,23 +75,76 @@ void Renderer::render() {
     float z = (*objectOffset)[VZ];
     glTranslatef(x, y, z);
   
-    glColor3f(0, 1, 0);
-    for (int i = 0; i < simulator->allParticles.size(); ++i) {
-        drawParticle(simulator->allParticles[i]);
+
+    if (properties.showParticles) {
+        glColor3f(0, 1, 0);
+        for (int i = 0; i < simulator->allParticles.size(); ++i) {
+            drawParticle(simulator->allParticles[i]);
+        }
     }
 
-    // Draw lattice points used in surface reconstruction
-    surface.resample();
-    glColor3f(1, 0, 0);
-    drawLatticePoints(surface);
+    //if (properties.showLattice || properties.showMesh) {
+    //    surface.resample();
+    //}
 
-    vector<MeshTriangle>* triangles = surface.getMesh();
-    glColor3f(1, 1, 0);
-    glBegin(GL_LINES);
-    for (int i = 0; i < triangles->size(); ++i) {
-        (*triangles)[i].drawOutline();
+    if (properties.showLattice) {
+        // Draw lattice points used in surface reconstruction
+        glColor3f(1, 0, 0);
+        drawLatticePoints(surface);
     }
-    glEnd();
+
+    if (properties.showMesh) {
+        glEnable(GL_DEPTH_TEST);
+        glEnable(GL_LIGHTING);
+
+        GLfloat mat_specular[] = { 0.9, 0.9, 0.9, 1.0 };
+        GLfloat mat_shininess[] = { 20.0 };
+        GLfloat mat_diffuse[] = { 0.9, 0.9, 0.9, 1.0 };
+        glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
+        glMaterialfv(GL_FRONT, GL_SHININESS, mat_shininess);
+        glMaterialfv(GL_FRONT, GL_DIFFUSE, mat_diffuse);
+
+        glEnable(GL_LIGHT0);
+        GLfloat l0_position[] = { -10.0, -10.0, -2, 0.0 };
+        GLfloat l0_diffuse[] = { 0.5, 0.5, 0.9, 1.0 };
+        GLfloat l0_specular[] = { 0.5, 0.5, 0.9, 1.0 };
+        GLfloat l0_shininess[] = { 20.0 };
+        glLightfv(GL_LIGHT0, GL_DIFFUSE, l0_diffuse);
+        glLightfv(GL_LIGHT0, GL_SPECULAR, l0_specular);
+        glLightfv(GL_LIGHT0, GL_SHININESS, l0_shininess);
+        glLightfv(GL_LIGHT0, GL_POSITION, l0_position);
+
+        glEnable(GL_LIGHT1);
+        GLfloat l1_position[] = { 10.0, 0.0, 0.0, 0.0 };
+        GLfloat l1_diffuse[] = { 0.5, 0.9, 0.5, 1.0 };
+        GLfloat l1_specular[] = { 0.5, 0.9, 0.5, 1.0 };
+        GLfloat l1_shininess[] = { 20.0 };
+        glLightfv(GL_LIGHT1, GL_DIFFUSE, l1_diffuse);
+        glLightfv(GL_LIGHT1, GL_SPECULAR, l1_specular);
+        glLightfv(GL_LIGHT1, GL_SHININESS, l1_shininess);
+        glLightfv(GL_LIGHT1, GL_POSITION, l1_position);
+
+        glEnable(GL_LIGHT2);
+        GLfloat l2_position[] = { 0.0, 0.0, 10.0, 0.0 };
+        GLfloat l2_diffuse[] = { 0.5, 0.5, 0.5, 1.0 };
+        GLfloat l2_specular[] = { 0.5, 0.5, 0.5, 1.0 };
+        GLfloat l2_shininess[] = { 20.0 };
+        glLightfv(GL_LIGHT2, GL_DIFFUSE, l2_diffuse);
+        glLightfv(GL_LIGHT2, GL_SPECULAR, l2_specular);
+        glLightfv(GL_LIGHT2, GL_SHININESS, l2_shininess);
+        glLightfv(GL_LIGHT2, GL_POSITION, l2_position);
+
+        vector<MeshTriangle>* triangles = surface.getMesh();
+        glColor3f(1, 1, 0);
+        //glBegin(GL_LINES);
+        glBegin(GL_TRIANGLES);
+        for (int i = 0; i < triangles->size(); ++i) {
+            //(*triangles)[i].drawOutline();
+            (*triangles)[i].drawFace();
+        }
+        glEnd();
+        glDisable(GL_LIGHTING);
+    }
   
     glColor3f(0, 0, 1);
     for(int i =0; i < simulator->objects.size(); i++) {
