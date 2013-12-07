@@ -21,6 +21,8 @@ struct MeshTriangle {
     }
 
     void drawFace() {
+        vec3 normal = ((a - b) ^ (a - c)).normalize();
+        glNormal3f(normal[VX], normal[VY], normal[VZ]);
         glVertex3f(a[VX], a[VY], a[VZ]);
         glVertex3f(b[VX], b[VY], b[VZ]);
         glVertex3f(c[VX], c[VY], c[VZ]);
