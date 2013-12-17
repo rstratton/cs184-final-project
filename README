@@ -1,13 +1,10 @@
-<<<<<<< HEAD
-This will be our readme for the fluid simulation.
+Partners:
+    Kavan Sikand (cs184-an)
+    Kevin Yanofsky (cs184-bc)
+    Robert Stratton (cs184-ax)
 
-For now we have nothing
-=======
-This will be our readme for the fluid simulation.
+Platform:
+    Mac OS X
 
-For now we have nothing
-
-put down notes here as you go:
-
-Note: NumParticles as specified in a scene file for each volume is only an estimate of the number of particles for sphere volumes. It will only be exact for values with an integer cubic root.
->>>>>>> 63972b6c63f0f84037bbc9d0bc3a61aaac99ec1f
+Submitted by:
+    Robert Stratton
